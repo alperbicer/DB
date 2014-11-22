@@ -1,0 +1,23 @@
+﻿Facebook's Scope and Analysing
+In BBC English:
+Facebook is world's #1 social network. It is powered by MySQL1, memcached, Haystack, Apache Cassandra, HipHop PHP runtime, Hack PHP transpiler, Hbase, Apache Hive, HDFS, Apache HTTP, Ubuntu and GNU/Linux. 
+
+Facebook is primarily based on “network of personal relationships”and requires real name2 to join. This includes close and remote friendships, shared activity boards(called 'Groups' in Facebook's speak), personal boards(called 'Timeline' in Facebook's speak). Friendship is a mutually inclusive relation between two users of Facebook and requires consent of both parties.
+
+There has also been appeared a one-way relationship called “subscription”(later amended to be read “following”) which a user can make it into a page and/or a user. Another important one-way relationship is “like”.(👍) This is a way to express “I liked and want to see similar things” in Facebook. This is the most used in advertising and one of the few features that can be embedded into external sites. There is no “dislike” on Facebook. 
+
+There is also a way to express enemyness among users, although it is not said to other party. It is “to block” a user.  Blocking a user disables any means to communicate between these two users to the extent they will not even see each other's existence(party who made blockade can, however, see the name of other party) , whereas Platform data is not affected.
+
+Facebook not only tracks friendships but also relatives. This allows them give you more detailed news from your family members.
+
+Organisations can join Facebook not as a dedicated organisational user but as a page operated by organisation staff.
+
+Facebook is aimed at people aged 13 and over. Children under 18 are specially protected by Facebook. They cannot share anything more publicly than the circle of “friends of friends” except the fundamental quintuple3 (name, network, gender, current profile picture, cover photo, username) and are not allowed to share anything with advertising companies and cannot be searched publicly.
+
+Facebook is mostly supported by ads but there are some features that are only accessible via payout. The most known one is “activity stream promotion”. This puts your post at position #1 in a feed for two weeks.
+
+
+LinkedIn's Scope And Analysing
+
+LinkedIn is a business-oriented social network.
+Employees can look for jobs there. Employers can also look for employees. They can upload photos to help them identify. Users can access LinkedIn via
