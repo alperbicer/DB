@@ -21,3 +21,33 @@ LinkedIn's Scope And Analysing
 
 LinkedIn is a business-oriented social network.
 Employees can look for jobs there. Employers can also look for employees. They can upload photos to help them identify. Users can access LinkedIn via
+
+Detailed analysis of Facebook
+
+These are the main entities of Facebook:
+-User:Each user is identified by a user name. User is the actor in Facebook.
+-Friendship:It is the mutual relationship among exactly two users. Each user has friends and they identify him.
+-Block
+-Activity Feed:Activity feed is the stream of the news we get on the homepage of client and the corresponding APIs.
+-Activity Log:It is the list of all activities user made. This can only accessed by user itself, however, may be retrieved using API.
+-Comment:It is stream of a Unicode text user types to express his ideas on another entities. Comments can also be commented on pages.
+-Page:It is operated by one or more users of Facebook. Represents an instituion or other community. It is also an actor, however, pages are not users. Pages are made by users in Facebook.
+-Group:Community of remotely related users of Facebook. Groups are used to share something.
+-Like
+-Anonymous page:These are kind of pages representing individual interests. These are not actor.
+
+User N==5000 Friend:: Friendship (Facebook does not mandate to have a friendship, however, it is basis of Facebook network)
+Administrator 1=-N Friend:: Mark Zuckerberg's friendships are special-cased in Facebook, they can add friends on its own, only friends of friends can see its friend list or send a friendship request, and not limited by number
+User N--N Blockee:: Blockade
+User 1=-N Page:: Page Ownership
+Commentator(user or page) 1-=N Comment:: Comment
+User or page 1-=N:: Like Like
+Page M--N User:: Advertisement
+Post 1=-N User:: Post privacy setting
+Origin(user) 1=-N Target(user or page or group):: Post share setting
+User M-=N Group:: Group membership
+User M-=N Group or page:: Group/page administration
+User 0==N Anonymous page:: Anonymous page may not have administrators
+User 1=-N Anonymous page:: Anonymous page creatorship
+User or page or group 1==1 Activity stream
+User 1==1 Activity log
