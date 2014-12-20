@@ -3,7 +3,7 @@
 -- http://www.phpmyadmin.net
 --
 -- Anamakine: localhost
--- Üretim Zamanı: 20 Ara 2014, 11:51:46
+-- Üretim Zamanı: 20 Ara 2014, 12:28:30
 -- Sunucu sürümü: 5.5.40-0ubuntu1
 -- PHP Sürümü: 5.5.12-2ubuntu5
 
@@ -39,22 +39,29 @@ CREATE TABLE IF NOT EXISTS `actors` (
 CREATE TABLE IF NOT EXISTS `address` (
   `address_id` int(11) NOT NULL,
   `door` int(11) NOT NULL,
-  `buildingname` varchar(180) COLLATE utf32_turkish_ci NOT NULL,
+  `buildingname` varchar(180) COLLATE utf32_turkish_ci DEFAULT NULL,
   `street` varchar(180) COLLATE utf32_turkish_ci NOT NULL,
-  `avenue` varchar(180) COLLATE utf32_turkish_ci NOT NULL,
-  `boulevard` varchar(180) COLLATE utf32_turkish_ci NOT NULL,
-  `locality` varchar(180) COLLATE utf32_turkish_ci NOT NULL,
-  `neighbourhood` varchar(80) COLLATE utf32_turkish_ci NOT NULL,
-  `village` varchar(80) COLLATE utf32_turkish_ci NOT NULL,
-  `county` varchar(80) COLLATE utf32_turkish_ci NOT NULL,
-  `township` varchar(80) COLLATE utf32_turkish_ci NOT NULL,
+  `avenue` varchar(180) COLLATE utf32_turkish_ci DEFAULT NULL,
+  `boulevard` varchar(180) COLLATE utf32_turkish_ci DEFAULT NULL,
+  `locality` varchar(180) COLLATE utf32_turkish_ci DEFAULT NULL,
+  `neighbourhood` varchar(80) COLLATE utf32_turkish_ci DEFAULT NULL,
+  `village` varchar(80) COLLATE utf32_turkish_ci DEFAULT NULL,
+  `county` varchar(80) COLLATE utf32_turkish_ci DEFAULT NULL,
+  `township` varchar(80) COLLATE utf32_turkish_ci DEFAULT NULL,
   `town` int(11) NOT NULL,
   `city` int(11) NOT NULL,
-  `province` int(11) NOT NULL,
-  `state` int(11) NOT NULL,
-  `confederate` int(11) NOT NULL,
+  `province` int(11) DEFAULT NULL,
+  `state` int(11) DEFAULT NULL,
+  `confederate` int(11) DEFAULT NULL,
   `country` char(3) COLLATE utf32_turkish_ci NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf32 COLLATE=utf32_turkish_ci;
+
+--
+-- Tablo döküm verisi `address`
+--
+
+INSERT INTO `address` (`address_id`, `door`, `buildingname`, `street`, `avenue`, `boulevard`, `locality`, `neighbourhood`, `village`, `county`, `township`, `town`, `city`, `province`, `state`, `confederate`, `country`) VALUES
+(1, 17, NULL, '1909. Sokak', '1912. Sokak', 'Nursultan Nazarbayev Caddesi', NULL, 'Bayraklı Mahallesi', NULL, 'Smyrna', 'Bayraklı 3. Yerleşim Bölgesi', 2, 1, 1, 5, NULL, 'TUR');
 
 -- --------------------------------------------------------
 
@@ -104,6 +111,18 @@ CREATE TABLE IF NOT EXISTS `city` (
   `city` varchar(286) COLLATE utf32_turkish_ci NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf32 COLLATE=utf32_turkish_ci;
 
+--
+-- Tablo döküm verisi `city`
+--
+
+INSERT INTO `city` (`id`, `city`) VALUES
+(1, 'İzmir'),
+(2, 'Bayraklı'),
+(3, 'Bornova'),
+(4, 'Krungthepmahanakhon Amonrattanakosin Mahintharayutthaya Mahadilokphop Noppharatratchathaniburirom Udomratchaniwetmahasathan Amonphimanawatansathit Sakkathattiyawitsanukamprasit'),
+(5, 'Ege Bölgesi'),
+(6, 'Marmara Bölgesi');
+
 -- --------------------------------------------------------
 
 --
@@ -141,6 +160,14 @@ CREATE TABLE IF NOT EXISTS `country` (
   `country` varchar(80) COLLATE utf32_turkish_ci NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf32 COLLATE=utf32_turkish_ci;
 
+--
+-- Tablo döküm verisi `country`
+--
+
+INSERT INTO `country` (`id`, `country`) VALUES
+('TUR', 'Turkey'),
+('USA', 'United States of America');
+
 -- --------------------------------------------------------
 
 --
@@ -163,6 +190,13 @@ CREATE TABLE IF NOT EXISTS `emails` (
   `email_id` int(11) NOT NULL,
   `email_textual` varchar(50) COLLATE utf32_turkish_ci NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf32 COLLATE=utf32_turkish_ci;
+
+--
+-- Tablo döküm verisi `emails`
+--
+
+INSERT INTO `emails` (`email_id`, `email_textual`) VALUES
+(1, 'erkinalp9035@gmail.com');
 
 -- --------------------------------------------------------
 
@@ -266,7 +300,7 @@ CREATE TABLE IF NOT EXISTS `gender` (
 -- Tablo döküm verisi `gender`
 --
 
-INSERT INTO `gender` VALUES
+INSERT INTO `gender` (`gender_id`, `gender`) VALUES
 (0, 'Neutral Gender'),
 (1, 'Female'),
 (2, 'Male'),
@@ -344,7 +378,7 @@ CREATE TABLE IF NOT EXISTS `marital_status` (
 -- Tablo döküm verisi `marital_status`
 --
 
-INSERT INTO `marital_status` VALUES
+INSERT INTO `marital_status` (`marital_status_id`, `marital_status_name`) VALUES
 (0, 'Unmarried'),
 (1, 'Married and stlll not yet divorced'),
 (2, 'Divorced'),
@@ -510,8 +544,8 @@ CREATE TABLE IF NOT EXISTS `user_info` (
   `date_joined` date NOT NULL,
   `date_of_birth` date NOT NULL,
   `givenname` varchar(50) COLLATE utf32_turkish_ci NOT NULL,
-  `middlename` varchar(50) COLLATE utf32_turkish_ci NOT NULL,
-  `lastname` varchar(50) COLLATE utf32_turkish_ci NOT NULL,
+  `middlename` varchar(50) COLLATE utf32_turkish_ci DEFAULT NULL,
+  `familyname` varchar(50) COLLATE utf32_turkish_ci DEFAULT NULL,
   `gender` int(11) NOT NULL,
   `marital_status_code` int(11) NOT NULL,
   `quit` tinyint(1) NOT NULL DEFAULT '0',
@@ -520,6 +554,13 @@ CREATE TABLE IF NOT EXISTS `user_info` (
   `rating` int(11) NOT NULL,
   `mail` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf32 COLLATE=utf32_turkish_ci;
+
+--
+-- Tablo döküm verisi `user_info`
+--
+
+INSERT INTO `user_info` (`user_id`, `date_joined`, `date_of_birth`, `givenname`, `middlename`, `familyname`, `gender`, `marital_status_code`, `quit`, `address`, `religion`, `rating`, `mail`) VALUES
+(57, '2012-12-21', '1994-12-27', 'Erkin', 'Alp', 'Güney', 2, 0, 0, 1, NULL, 0, 1);
 
 --
 -- Dökümü yapılmış tablolar için indeksler
