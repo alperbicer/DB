@@ -3,7 +3,7 @@
 -- http://www.phpmyadmin.net
 --
 -- Anamakine: localhost
--- Üretim Zamanı: 20 Ara 2014, 17:16:00
+-- Üretim Zamanı: 21 Ara 2014, 19:46:32
 -- Sunucu sürümü: 5.5.40-0ubuntu1
 -- PHP Sürümü: 5.5.12-2ubuntu5
 
@@ -28,7 +28,7 @@ SET time_zone = "+00:00";
 
 CREATE TABLE IF NOT EXISTS `actors` (
 `actor_id` int(11) NOT NULL
-) ENGINE=InnoDB AUTO_INCREMENT=63 DEFAULT CHARSET=utf32 COLLATE=utf32_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=63 DEFAULT CHARSET=utf32 COLLATE=utf32_turkish_ci;
 
 --
 -- Tablo döküm verisi `actors`
@@ -239,7 +239,7 @@ CREATE TABLE IF NOT EXISTS `employment` (
   `date_started` int(11) NOT NULL,
   `date_quit` int(11) DEFAULT NULL,
   `fired` tinyint(1) NOT NULL DEFAULT '0'
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=utf32 COLLATE=utf32_turkish_ci;
 
 -- --------------------------------------------------------
 
@@ -355,10 +355,10 @@ INSERT INTO `gender` (`gender_id`, `gender`) VALUES
 -- --------------------------------------------------------
 
 --
--- Tablo için tablo yapısı `group`
+-- Tablo için tablo yapısı `groups`
 --
 
-CREATE TABLE IF NOT EXISTS `group` (
+CREATE TABLE IF NOT EXISTS `groups` (
   `group_id` int(11) NOT NULL,
   `privacy` int(11) NOT NULL,
   `created_by` int(11) DEFAULT '57',
@@ -370,10 +370,10 @@ CREATE TABLE IF NOT EXISTS `group` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf32 COLLATE=utf32_turkish_ci;
 
 --
--- Tablo döküm verisi `group`
+-- Tablo döküm verisi `groups`
 --
 
-INSERT INTO `group` (`group_id`, `privacy`, `created_by`, `name`, `description`, `created_on`, `destroyed_on`, `last_actvity_happened`) VALUES
+INSERT INTO `groups` (`group_id`, `privacy`, `created_by`, `name`, `description`, `created_on`, `destroyed_on`, `last_actvity_happened`) VALUES
 (60, 0, 57, 'Veritabanı Yönetimi Dersini Erkin Alp GÜNEY''den alanlar grubu', 'Bu grup, veritabanı yönetimi dersini Erkin Alp Güney''den alanlara adanmıştır.', '2014-12-20', NULL, 0);
 
 -- --------------------------------------------------------
@@ -406,6 +406,17 @@ CREATE TABLE IF NOT EXISTS `interests` (
   `id` int(11) NOT NULL,
   `interest` varchar(255) COLLATE utf32_turkish_ci NOT NULL,
   `profile_id` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf32 COLLATE=utf32_turkish_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Tablo için tablo yapısı `job_type`
+--
+
+CREATE TABLE IF NOT EXISTS `job_type` (
+  `job_type_page` int(11) NOT NULL,
+  `job_description` text COLLATE utf32_turkish_ci NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf32 COLLATE=utf32_turkish_ci;
 
 -- --------------------------------------------------------
@@ -533,8 +544,8 @@ CREATE TABLE IF NOT EXISTS `phones` (
 
 CREATE TABLE IF NOT EXISTS `phone_types` (
   `phone_number` decimal(28,0) NOT NULL DEFAULT '0',
-  `phone_type` enum('fixed','cellular','voip','') CHARACTER SET utf32 COLLATE utf32_turkish_ci NOT NULL DEFAULT 'voip'
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+  `phone_type` enum('fixed','cellular','voip','') COLLATE utf32_turkish_ci NOT NULL DEFAULT 'voip'
+) ENGINE=InnoDB DEFAULT CHARSET=utf32 COLLATE=utf32_turkish_ci;
 
 -- --------------------------------------------------------
 
@@ -636,6 +647,21 @@ CREATE TABLE IF NOT EXISTS `user_info` (
 
 INSERT INTO `user_info` (`user_id`, `date_joined`, `date_of_birth`, `givenname`, `middlename`, `familyname`, `gender`, `marital_status_code`, `quit`, `address`, `religion`, `rating`, `mail`, `lang`) VALUES
 (57, '2012-12-21', '1994-12-27', 'Erkin', 'Alp', 'Güney', 2, 0, 0, 1, NULL, 0, 1, 1);
+
+-- --------------------------------------------------------
+
+--
+-- Tablo için tablo yapısı `want_ad`
+--
+
+CREATE TABLE IF NOT EXISTS `want_ad` (
+  `employer_id` int(11) NOT NULL,
+  `ad_responsibility` int(11) NOT NULL,
+  `job_type` int(11) NOT NULL,
+  `description` text COLLATE utf32_turkish_ci NOT NULL,
+  `created_on` date NOT NULL,
+  `dropped_on` date DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf32 COLLATE=utf32_turkish_ci;
 
 --
 -- Dökümü yapılmış tablolar için indeksler
@@ -750,9 +776,9 @@ ALTER TABLE `gender`
  ADD PRIMARY KEY (`gender_id`);
 
 --
--- Tablo için indeksler `group`
+-- Tablo için indeksler `groups`
 --
-ALTER TABLE `group`
+ALTER TABLE `groups`
  ADD PRIMARY KEY (`group_id`), ADD KEY `created_by` (`created_by`);
 
 --
@@ -766,6 +792,12 @@ ALTER TABLE `group_membership`
 --
 ALTER TABLE `interests`
  ADD PRIMARY KEY (`id`);
+
+--
+-- Tablo için indeksler `job_type`
+--
+ALTER TABLE `job_type`
+ ADD PRIMARY KEY (`job_type_page`);
 
 --
 -- Tablo için indeksler `lang`
@@ -852,6 +884,12 @@ ALTER TABLE `user_info`
  ADD PRIMARY KEY (`user_id`), ADD KEY `mail` (`mail`) COMMENT 'user_email', ADD KEY `user_gender` (`gender`), ADD KEY `user_marital` (`marital_status_code`), ADD KEY `user_address` (`address`), ADD KEY `religion` (`religion`), ADD KEY `user_locale` (`lang`);
 
 --
+-- Tablo için indeksler `want_ad`
+--
+ALTER TABLE `want_ad`
+ ADD PRIMARY KEY (`employer_id`,`ad_responsibility`,`job_type`), ADD KEY `ad_responsibility_user` (`ad_responsibility`), ADD KEY `ad_job_type` (`job_type`);
+
+--
 -- Dökümü yapılmış tablolar için AUTO_INCREMENT değeri
 --
 
@@ -880,13 +918,13 @@ ADD CONSTRAINT `employer_user` FOREIGN KEY (`employer_user`) REFERENCES `user_in
 -- Tablo kısıtlamaları `employment`
 --
 ALTER TABLE `employment`
-ADD CONSTRAINT `employment_employer` FOREIGN KEY (`employer`) REFERENCES `employer` (`employer_id`),
-ADD CONSTRAINT `employee_ref` FOREIGN KEY (`employee`) REFERENCES `user_info` (`user_id`);
+ADD CONSTRAINT `employee_ref` FOREIGN KEY (`employee`) REFERENCES `user_info` (`user_id`),
+ADD CONSTRAINT `employment_employer` FOREIGN KEY (`employer`) REFERENCES `employer` (`employer_id`);
 
 --
--- Tablo kısıtlamaları `group`
+-- Tablo kısıtlamaları `groups`
 --
-ALTER TABLE `group`
+ALTER TABLE `groups`
 ADD CONSTRAINT `group_actor` FOREIGN KEY (`group_id`) REFERENCES `actors` (`actor_id`),
 ADD CONSTRAINT `group_creator` FOREIGN KEY (`created_by`) REFERENCES `user_info` (`user_id`);
 
@@ -894,8 +932,8 @@ ADD CONSTRAINT `group_creator` FOREIGN KEY (`created_by`) REFERENCES `user_info`
 -- Tablo kısıtlamaları `group_membership`
 --
 ALTER TABLE `group_membership`
-ADD CONSTRAINT `group_ref` FOREIGN KEY (`group_id`) REFERENCES `group` (`group_id`),
-ADD CONSTRAINT `group_member` FOREIGN KEY (`user_id`) REFERENCES `user_info` (`user_id`);
+ADD CONSTRAINT `group_member` FOREIGN KEY (`user_id`) REFERENCES `user_info` (`user_id`),
+ADD CONSTRAINT `group_ref` FOREIGN KEY (`group_id`) REFERENCES `groups` (`group_id`);
 
 --
 -- Tablo kısıtlamaları `page_generic`
@@ -907,13 +945,21 @@ ADD CONSTRAINT `page_actor` FOREIGN KEY (`pagenumber`) REFERENCES `actors` (`act
 -- Tablo kısıtlamaları `user_info`
 --
 ALTER TABLE `user_info`
-ADD CONSTRAINT `user_lang` FOREIGN KEY (`lang`) REFERENCES `lang` (`id`),
 ADD CONSTRAINT `religion` FOREIGN KEY (`religion`) REFERENCES `page_generic` (`pagenumber`),
 ADD CONSTRAINT `user_actor` FOREIGN KEY (`user_id`) REFERENCES `actors` (`actor_id`) ON DELETE CASCADE,
 ADD CONSTRAINT `user_address` FOREIGN KEY (`address`) REFERENCES `address` (`address_id`),
 ADD CONSTRAINT `user_email` FOREIGN KEY (`mail`) REFERENCES `emails` (`email_id`) ON UPDATE CASCADE,
 ADD CONSTRAINT `user_gender` FOREIGN KEY (`gender`) REFERENCES `gender` (`gender_id`) ON UPDATE CASCADE,
+ADD CONSTRAINT `user_lang` FOREIGN KEY (`lang`) REFERENCES `lang` (`id`),
 ADD CONSTRAINT `user_marital` FOREIGN KEY (`marital_status_code`) REFERENCES `marital_status` (`marital_status_id`) ON UPDATE CASCADE;
+
+--
+-- Tablo kısıtlamaları `want_ad`
+--
+ALTER TABLE `want_ad`
+ADD CONSTRAINT `ad_goes_to` FOREIGN KEY (`employer_id`) REFERENCES `employer` (`employer_id`),
+ADD CONSTRAINT `ad_job_type` FOREIGN KEY (`job_type`) REFERENCES `job_type` (`job_type_page`),
+ADD CONSTRAINT `ad_responsibility_user` FOREIGN KEY (`ad_responsibility`) REFERENCES `user_info` (`user_id`);
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
