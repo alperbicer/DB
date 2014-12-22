@@ -3,7 +3,7 @@
 -- http://www.phpmyadmin.net
 --
 -- Anamakine: localhost
--- Üretim Zamanı: 21 Ara 2014, 19:46:32
+-- Üretim Zamanı: 22 Ara 2014, 09:50:51
 -- Sunucu sürümü: 5.5.40-0ubuntu1
 -- PHP Sürümü: 5.5.12-2ubuntu5
 
@@ -145,7 +145,8 @@ INSERT INTO `city` (`id`, `city`) VALUES
 CREATE TABLE IF NOT EXISTS `comments` (
   `id` int(11) NOT NULL,
   `comment` varchar(250) COLLATE utf32_turkish_ci NOT NULL,
-  `picture_id` int(11) NOT NULL
+  `post_id` int(11) NOT NULL,
+  `created_by` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf32 COLLATE=utf32_turkish_ci;
 
 -- --------------------------------------------------------
@@ -440,13 +441,26 @@ INSERT INTO `lang` (`id`, `language`) VALUES
 -- --------------------------------------------------------
 
 --
+-- Tablo için tablo yapısı `like_dislike`
+--
+
+CREATE TABLE IF NOT EXISTS `like_dislike` (
+  `id` int(11) NOT NULL,
+  `whois_id` int(11) NOT NULL,
+  `post_id` int(11) NOT NULL,
+  `likescore` tinyint(4) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf32 COLLATE=utf32_turkish_ci;
+
+-- --------------------------------------------------------
+
+--
 -- Tablo için tablo yapısı `marital_status`
 --
 
 CREATE TABLE IF NOT EXISTS `marital_status` (
-  `marital_status_id` smallint(6) NOT NULL,
+`marital_status_id` smallint(6) NOT NULL,
   `marital_status_name` text COLLATE utf32_turkish_ci NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf32 COLLATE=utf32_turkish_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=utf32 COLLATE=utf32_turkish_ci;
 
 --
 -- Tablo döküm verisi `marital_status`
@@ -456,7 +470,13 @@ INSERT INTO `marital_status` (`marital_status_id`, `marital_status_name`) VALUES
 (0, 'Unmarried'),
 (1, 'Married and stlll not yet divorced'),
 (2, 'Divorced'),
-(3, 'Widow');
+(3, 'Widow'),
+(4, 'Muslim sexual servant'),
+(5, 'African sexual servant'),
+(6, 'Unpaid slave worker'),
+(7, 'Irreproducible Robot'),
+(8, 'Nonhuman intelligent animal'),
+(9, 'Illegal sexual servant');
 
 -- --------------------------------------------------------
 
@@ -509,7 +529,6 @@ CREATE TABLE IF NOT EXISTS `page_generic` (
 --
 
 INSERT INTO `page_generic` (`pagenumber`, `date_created`, `summary`, `description`, `privacy`) VALUES
-(0, '2012-12-21', 'Public People', 'This is an anonymous page to cover privacy setting public.', 0),
 (59, '2014-12-20', 'Ege Üniversitesi', 'Ege Üniversitesi, 1955 yılında Muhiddin EREL öncülüğünde kurulmuş bir Türk yükseköğretim okuludur.', 0),
 (61, '0571-04-07', 'Islam', NULL, 0),
 (62, '2012-12-21', 'Religion of Mozilla', 'What you see in about:mozilla on Firefox is our book. We believe in free software and free web''s power.', 0);
@@ -555,11 +574,35 @@ CREATE TABLE IF NOT EXISTS `phone_types` (
 
 CREATE TABLE IF NOT EXISTS `picture` (
   `id` int(11) NOT NULL,
-  `user_id` int(11) NOT NULL,
+  `posted_by` int(11) NOT NULL COMMENT 'user or group or page',
   `p_address` varchar(150) COLLATE utf32_turkish_ci NOT NULL,
-  `privacy` int(11) NOT NULL,
+  `privacy` int(11) NOT NULL COMMENT 'user or group or page or friend list',
   `created_at` date NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf32 COLLATE=utf32_turkish_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Tablo için tablo yapısı `privacy_target`
+--
+
+CREATE TABLE IF NOT EXISTS `privacy_target` (
+  `target_id` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+--
+-- Tablo döküm verisi `privacy_target`
+--
+
+INSERT INTO `privacy_target` (`target_id`) VALUES
+(0),
+(1),
+(57),
+(58),
+(59),
+(60),
+(61),
+(62);
 
 -- --------------------------------------------------------
 
@@ -582,7 +625,7 @@ CREATE TABLE IF NOT EXISTS `reply` (
 CREATE TABLE IF NOT EXISTS `status` (
   `id` int(11) NOT NULL,
   `message` varchar(255) COLLATE utf32_turkish_ci NOT NULL,
-  `created_at` int(11) NOT NULL,
+  `created_at` date NOT NULL,
   `thumbs_up` int(11) NOT NULL,
   `thumbs_down` int(11) NOT NULL,
   `privacy` int(11) NOT NULL,
@@ -603,18 +646,6 @@ CREATE TABLE IF NOT EXISTS `tags` (
   `tag_id` int(11) NOT NULL,
   `who_id` int(11) NOT NULL,
   `status` int(11) NOT NULL,
-  `picture_id` int(11) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf32 COLLATE=utf32_turkish_ci;
-
--- --------------------------------------------------------
-
---
--- Tablo için tablo yapısı `thumbs_up`
---
-
-CREATE TABLE IF NOT EXISTS `thumbs_up` (
-  `id` int(11) NOT NULL,
-  `whois_id` int(11) NOT NULL,
   `post_id` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf32 COLLATE=utf32_turkish_ci;
 
@@ -704,6 +735,12 @@ ALTER TABLE `city`
  ADD PRIMARY KEY (`id`);
 
 --
+-- Tablo için indeksler `comments`
+--
+ALTER TABLE `comments`
+ ADD PRIMARY KEY (`id`), ADD KEY `comment_created_by` (`created_by`) COMMENT 'User, group or page can comment';
+
+--
 -- Tablo için indeksler `connections`
 --
 ALTER TABLE `connections`
@@ -767,7 +804,7 @@ ALTER TABLE `friend`
 -- Tablo için indeksler `friend_list`
 --
 ALTER TABLE `friend_list`
- ADD PRIMARY KEY (`id`);
+ ADD PRIMARY KEY (`id`), ADD KEY `friendlist_target` (`privacy`);
 
 --
 -- Tablo için indeksler `gender`
@@ -806,6 +843,12 @@ ALTER TABLE `lang`
  ADD PRIMARY KEY (`id`);
 
 --
+-- Tablo için indeksler `like_dislike`
+--
+ALTER TABLE `like_dislike`
+ ADD PRIMARY KEY (`id`), ADD UNIQUE KEY `whois_id` (`whois_id`,`post_id`), ADD UNIQUE KEY `whois_id_2` (`whois_id`,`post_id`,`likescore`);
+
+--
 -- Tablo için indeksler `marital_status`
 --
 ALTER TABLE `marital_status`
@@ -821,7 +864,7 @@ ALTER TABLE `messages`
 -- Tablo için indeksler `notification`
 --
 ALTER TABLE `notification`
- ADD PRIMARY KEY (`id`), ADD KEY `msg` (`msg`(191),`created_at`);
+ ADD PRIMARY KEY (`id`), ADD KEY `msg` (`msg`(191),`created_at`), ADD KEY `notified_to` (`user_id`), ADD KEY `notification_target` (`privacy`);
 
 --
 -- Tablo için indeksler `page_generic`
@@ -833,7 +876,7 @@ ALTER TABLE `page_generic`
 -- Tablo için indeksler `page_ownership`
 --
 ALTER TABLE `page_ownership`
- ADD PRIMARY KEY (`pagenumber`);
+ ADD PRIMARY KEY (`pagenumber`), ADD KEY `page_created_by` (`created_by`) COMMENT 'user';
 
 --
 -- Tablo için indeksler `phones`
@@ -851,7 +894,13 @@ ALTER TABLE `phone_types`
 -- Tablo için indeksler `picture`
 --
 ALTER TABLE `picture`
- ADD PRIMARY KEY (`id`);
+ ADD PRIMARY KEY (`id`), ADD KEY `post_privacy` (`privacy`) COMMENT 'To whom the post is visible', ADD KEY `posted_by` (`posted_by`);
+
+--
+-- Tablo için indeksler `privacy_target`
+--
+ALTER TABLE `privacy_target`
+ ADD PRIMARY KEY (`target_id`);
 
 --
 -- Tablo için indeksler `reply`
@@ -863,19 +912,13 @@ ALTER TABLE `reply`
 -- Tablo için indeksler `status`
 --
 ALTER TABLE `status`
- ADD PRIMARY KEY (`id`);
+ ADD PRIMARY KEY (`id`), ADD KEY `status_update_by` (`user_id`), ADD KEY `status_target` (`privacy`);
 
 --
 -- Tablo için indeksler `tags`
 --
 ALTER TABLE `tags`
- ADD PRIMARY KEY (`id`);
-
---
--- Tablo için indeksler `thumbs_up`
---
-ALTER TABLE `thumbs_up`
- ADD PRIMARY KEY (`id`), ADD UNIQUE KEY `whois_id` (`whois_id`,`post_id`);
+ ADD PRIMARY KEY (`id`), ADD KEY `tagged_by` (`who_id`), ADD KEY `tagged` (`tag_id`), ADD KEY `tagged_in` (`post_id`);
 
 --
 -- Tablo için indeksler `user_info`
@@ -904,6 +947,11 @@ MODIFY `actor_id` int(11) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=63;
 ALTER TABLE `employer`
 MODIFY `employer_id` int(11) NOT NULL AUTO_INCREMENT;
 --
+-- Tablo için AUTO_INCREMENT değeri `marital_status`
+--
+ALTER TABLE `marital_status`
+MODIFY `marital_status_id` smallint(6) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=10;
+--
 -- Dökümü yapılmış tablolar için kısıtlamalar
 --
 
@@ -922,6 +970,13 @@ ADD CONSTRAINT `employee_ref` FOREIGN KEY (`employee`) REFERENCES `user_info` (`
 ADD CONSTRAINT `employment_employer` FOREIGN KEY (`employer`) REFERENCES `employer` (`employer_id`);
 
 --
+-- Tablo kısıtlamaları `friend_list`
+--
+ALTER TABLE `friend_list`
+ADD CONSTRAINT `friend_list_visibility` FOREIGN KEY (`privacy`) REFERENCES `privacy_target` (`target_id`),
+ADD CONSTRAINT `friend_list_as_a_privacy_target` FOREIGN KEY (`id`) REFERENCES `privacy_target` (`target_id`);
+
+--
 -- Tablo kısıtlamaları `groups`
 --
 ALTER TABLE `groups`
@@ -936,10 +991,45 @@ ADD CONSTRAINT `group_member` FOREIGN KEY (`user_id`) REFERENCES `user_info` (`u
 ADD CONSTRAINT `group_ref` FOREIGN KEY (`group_id`) REFERENCES `groups` (`group_id`);
 
 --
+-- Tablo kısıtlamaları `like_dislike`
+--
+ALTER TABLE `like_dislike`
+ADD CONSTRAINT `liked_by` FOREIGN KEY (`whois_id`) REFERENCES `actors` (`actor_id`);
+
+--
 -- Tablo kısıtlamaları `page_generic`
 --
 ALTER TABLE `page_generic`
 ADD CONSTRAINT `page_actor` FOREIGN KEY (`pagenumber`) REFERENCES `actors` (`actor_id`);
+
+--
+-- Tablo kısıtlamaları `page_ownership`
+--
+ALTER TABLE `page_ownership`
+ADD CONSTRAINT `page_created_by` FOREIGN KEY (`created_by`) REFERENCES `user_info` (`user_id`),
+ADD CONSTRAINT `owned_page_existing` FOREIGN KEY (`pagenumber`) REFERENCES `page_generic` (`pagenumber`);
+
+--
+-- Tablo kısıtlamaları `picture`
+--
+ALTER TABLE `picture`
+ADD CONSTRAINT `privacy_target` FOREIGN KEY (`privacy`) REFERENCES `privacy_target` (`target_id`),
+ADD CONSTRAINT `poster` FOREIGN KEY (`posted_by`) REFERENCES `actors` (`actor_id`);
+
+--
+-- Tablo kısıtlamaları `status`
+--
+ALTER TABLE `status`
+ADD CONSTRAINT `status_target` FOREIGN KEY (`privacy`) REFERENCES `privacy_target` (`target_id`),
+ADD CONSTRAINT `status_update_by` FOREIGN KEY (`user_id`) REFERENCES `actors` (`actor_id`);
+
+--
+-- Tablo kısıtlamaları `tags`
+--
+ALTER TABLE `tags`
+ADD CONSTRAINT `tagged_in` FOREIGN KEY (`post_id`) REFERENCES `picture` (`id`),
+ADD CONSTRAINT `tagged` FOREIGN KEY (`tag_id`) REFERENCES `user_info` (`user_id`),
+ADD CONSTRAINT `tagged_by` FOREIGN KEY (`who_id`) REFERENCES `actors` (`actor_id`);
 
 --
 -- Tablo kısıtlamaları `user_info`
