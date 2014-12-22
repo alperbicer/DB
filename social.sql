@@ -3,7 +3,7 @@
 -- http://www.phpmyadmin.net
 --
 -- Anamakine: localhost
--- Üretim Zamanı: 22 Ara 2014, 11:39:18
+-- Üretim Zamanı: 22 Ara 2014, 17:41:05
 -- Sunucu sürümü: 5.5.40-0ubuntu1
 -- PHP Sürümü: 5.5.12-2ubuntu5
 
@@ -24,12 +24,16 @@ DELIMITER $$
 --
 -- İşlevler
 --
+CREATE DEFINER=`root`@`localhost` FUNCTION `get_average_like_score`() RETURNS double
+    READS SQL DATA
+return (select average(likescore) from social.like_dislike)$$
+
 CREATE DEFINER=`root`@`localhost` FUNCTION `get_total_like_score_post`(`a` INT) RETURNS int(11)
     READS SQL DATA
 return (select sum(likescore) from social.like_dislike where post_id=a)$$
 
 CREATE DEFINER=`root`@`localhost` FUNCTION `get_total_like_score_user`(`id` INT) RETURNS int(11)
-    NO SQL
+    READS SQL DATA
 return (select sum(likescore) from like_dislike where who_id=id)$$
 
 DELIMITER ;
@@ -41,21 +45,25 @@ DELIMITER ;
 --
 
 CREATE TABLE IF NOT EXISTS `actors` (
-`actor_id` int(11) NOT NULL
-) ENGINE=InnoDB AUTO_INCREMENT=63 DEFAULT CHARSET=utf32 COLLATE=utf32_turkish_ci;
+`actor_id` int(11) NOT NULL,
+  `privacy_minus` int(11) DEFAULT NULL
+) ENGINE=InnoDB AUTO_INCREMENT=65 DEFAULT CHARSET=utf32 COLLATE=utf32_turkish_ci;
 
 --
 -- Tablo döküm verisi `actors`
 --
 
-INSERT INTO `actors` (`actor_id`) VALUES
-(1),
-(57),
-(58),
-(59),
-(60),
-(61),
-(62);
+INSERT INTO `actors` (`actor_id`, `privacy_minus`) VALUES
+(0, NULL),
+(1, NULL),
+(57, NULL),
+(58, NULL),
+(59, NULL),
+(60, NULL),
+(61, NULL),
+(62, NULL),
+(63, NULL),
+(64, NULL);
 
 -- --------------------------------------------------------
 
@@ -88,6 +96,7 @@ CREATE TABLE IF NOT EXISTS `address` (
 --
 
 INSERT INTO `address` (`address_id`, `door`, `buildingname`, `street`, `avenue`, `boulevard`, `locality`, `neighbourhood`, `village`, `county`, `township`, `town`, `city`, `province`, `state`, `confederate`, `country`) VALUES
+(0, 174, 'Woodland Apartments', 'Edgewood Driveway', 'Newell Road', 'Woodland Avenue', 'Woodland ', 'Newell', NULL, NULL, 'Palo Alto', 7, 7, NULL, 8, NULL, 'USA'),
 (1, 17, NULL, '1909. Sokak', '1912. Sokak', 'Nursultan Nazarbayev Caddesi', NULL, 'Bayraklı Mahallesi', NULL, 'Smyrna', 'Bayraklı 3. Yerleşim Bölgesi', 2, 1, 1, 5, NULL, 'TUR');
 
 -- --------------------------------------------------------
@@ -124,7 +133,7 @@ CREATE TABLE IF NOT EXISTS `chat` (
   `id` int(11) NOT NULL,
   `to` int(11) NOT NULL,
   `created_at` date NOT NULL,
-  `user_id` int(11) NOT NULL
+  `created_by` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf32 COLLATE=utf32_turkish_ci;
 
 -- --------------------------------------------------------
@@ -148,7 +157,9 @@ INSERT INTO `city` (`id`, `city`) VALUES
 (3, 'Bornova'),
 (4, 'Krungthepmahanakhon Amonrattanakosin Mahintharayutthaya Mahadilokphop Noppharatratchathaniburirom Udomratchaniwetmahasathan Amonphimanawatansathit Sakkathattiyawitsanukamprasit'),
 (5, 'Ege Bölgesi'),
-(6, 'Marmara Bölgesi');
+(6, 'Marmara Bölgesi'),
+(7, 'Mountain View'),
+(8, 'California');
 
 -- --------------------------------------------------------
 
@@ -288,6 +299,7 @@ CREATE TABLE IF NOT EXISTS `emails` (
 --
 
 INSERT INTO `emails` (`email_id`, `email_textual`) VALUES
+(0, 'zuck@facebook.com'),
 (1, 'erkinalp9035@gmail.com'),
 (2, 'alperbicer@gmail.com');
 
@@ -445,16 +457,15 @@ CREATE TABLE IF NOT EXISTS `groups` (
   `name` varchar(80) COLLATE utf32_turkish_ci NOT NULL,
   `description` text COLLATE utf32_turkish_ci NOT NULL,
   `created_on` date NOT NULL,
-  `destroyed_on` date DEFAULT NULL,
-  `last_actvity_happened` int(11) NOT NULL
+  `destroyed_on` date DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf32 COLLATE=utf32_turkish_ci;
 
 --
 -- Tablo döküm verisi `groups`
 --
 
-INSERT INTO `groups` (`group_id`, `privacy`, `created_by`, `name`, `description`, `created_on`, `destroyed_on`, `last_actvity_happened`) VALUES
-(60, 0, 57, 'Veritabanı Yönetimi Dersini Erkin Alp GÜNEY''den alanlar grubu', 'Bu grup, veritabanı yönetimi dersini Erkin Alp Güney''den alanlara adanmıştır.', '2014-12-20', NULL, 0);
+INSERT INTO `groups` (`group_id`, `privacy`, `created_by`, `name`, `description`, `created_on`, `destroyed_on`) VALUES
+(60, 0, 57, 'Veritabanı Yönetimi Dersini Erkin Alp GÜNEY''den alanlar grubu', 'Bu grup, veritabanı yönetimi dersini Erkin Alp Güney''den alanlara adanmıştır.', '2014-12-20', NULL);
 
 -- --------------------------------------------------------
 
@@ -474,7 +485,8 @@ CREATE TABLE IF NOT EXISTS `group_membership` (
 --
 
 INSERT INTO `group_membership` (`user_id`, `group_id`, `membership_start`, `membership_end`) VALUES
-(57, 60, '2012-12-21', NULL);
+(57, 60, '2012-12-21', NULL),
+(63, 60, '2014-12-01', NULL);
 
 -- --------------------------------------------------------
 
@@ -515,6 +527,7 @@ CREATE TABLE IF NOT EXISTS `lang` (
 --
 
 INSERT INTO `lang` (`id`, `language`) VALUES
+(0, 'Phutongua'),
 (1, 'Türkçe');
 
 -- --------------------------------------------------------
@@ -565,7 +578,7 @@ INSERT INTO `marital_status` (`marital_status_id`, `marital_status_name`) VALUES
 
 CREATE TABLE IF NOT EXISTS `messages` (
   `id` int(11) NOT NULL,
-  `message` varchar(255) COLLATE utf32_turkish_ci NOT NULL,
+  `message` mediumtext COLLATE utf32_turkish_ci NOT NULL,
   `created_at` date NOT NULL,
   `is_read` int(11) NOT NULL,
   `is_spam` int(11) NOT NULL,
@@ -610,7 +623,8 @@ CREATE TABLE IF NOT EXISTS `page_generic` (
 INSERT INTO `page_generic` (`pagenumber`, `date_created`, `summary`, `description`, `privacy`) VALUES
 (59, '2014-12-20', 'Ege Üniversitesi', 'Ege Üniversitesi, 1955 yılında Muhiddin EREL öncülüğünde kurulmuş bir Türk yükseköğretim okuludur.', 0),
 (61, '0571-04-07', 'Islam', NULL, 0),
-(62, '2012-12-21', 'Religion of Mozilla', 'What you see in about:mozilla on Firefox is our book. We believe in free software and free web''s power.', 0);
+(62, '2012-12-21', 'Religion of Mozilla', 'What you see in about:mozilla on Firefox is our book. We believe in free software and free web''s power.', 0),
+(64, '0000-01-01', 'Christianity', 'This is the holy religion sent to the world through Jesus Christ.', 0);
 
 -- --------------------------------------------------------
 
@@ -653,7 +667,6 @@ CREATE TABLE IF NOT EXISTS `phone_types` (
 
 CREATE TABLE IF NOT EXISTS `picture` (
   `id` int(11) NOT NULL,
-  `posted_by` int(11) NOT NULL COMMENT 'user or group or page',
   `p_address` varchar(150) COLLATE utf32_turkish_ci NOT NULL,
   `privacy` int(11) NOT NULL COMMENT 'user or group or page or friend list',
   `created_at` date NOT NULL
@@ -662,27 +675,13 @@ CREATE TABLE IF NOT EXISTS `picture` (
 -- --------------------------------------------------------
 
 --
--- Tablo için tablo yapısı `privacy_target`
+-- Tablo için tablo yapısı `post`
 --
 
-CREATE TABLE IF NOT EXISTS `privacy_target` (
-  `target_id` int(11) NOT NULL,
-  `minus` int(11) NOT NULL
+CREATE TABLE IF NOT EXISTS `post` (
+  `post_id` int(11) NOT NULL,
+  `actor_id` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf32 COLLATE=utf32_turkish_ci;
-
---
--- Tablo döküm verisi `privacy_target`
---
-
-INSERT INTO `privacy_target` (`target_id`, `minus`) VALUES
-(0, 0),
-(1, 0),
-(57, 0),
-(58, 0),
-(59, 0),
-(60, 0),
-(61, 0),
-(62, 0);
 
 -- --------------------------------------------------------
 
@@ -711,7 +710,6 @@ CREATE TABLE IF NOT EXISTS `status` (
   `privacy` int(11) NOT NULL,
   `to_fb` varchar(80) COLLATE utf32_turkish_ci NOT NULL,
   `to_twitter` varchar(80) COLLATE utf32_turkish_ci NOT NULL,
-  `user_id` int(11) NOT NULL,
   `attachment` varchar(80) COLLATE utf32_turkish_ci DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf32 COLLATE=utf32_turkish_ci;
 
@@ -727,6 +725,18 @@ CREATE TABLE IF NOT EXISTS `tags` (
   `who_id` int(11) NOT NULL,
   `status` int(11) NOT NULL,
   `post_id` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf32 COLLATE=utf32_turkish_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Tablo için tablo yapısı `timeline`
+--
+
+CREATE TABLE IF NOT EXISTS `timeline` (
+  `actor_id` int(11) NOT NULL,
+  `post_id` int(11) NOT NULL,
+  `shown_at` date NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf32 COLLATE=utf32_turkish_ci;
 
 -- --------------------------------------------------------
@@ -757,7 +767,26 @@ CREATE TABLE IF NOT EXISTS `user_info` (
 --
 
 INSERT INTO `user_info` (`user_id`, `date_joined`, `date_of_birth`, `givenname`, `middlename`, `familyname`, `gender`, `marital_status_code`, `quit`, `address`, `religion`, `rating`, `mail`, `lang`) VALUES
-(57, '2012-12-21', '1994-12-27', 'Erkin', 'Alp', 'Güney', 2, 0, 0, 1, NULL, 0, 1, 1);
+(1, '2004-05-02', '1984-05-11', 'Mark', NULL, 'Zuckerberg', 2, 1, 0, 0, 64, 0, 0, 0),
+(57, '2012-12-21', '1994-12-27', 'Erkin', 'Alp', 'Güney', 2, 0, 0, 1, NULL, 0, 1, 1),
+(63, '2012-12-21', '1991-08-25', 'Alper', NULL, 'Biçer', 2, 0, 0, 1, 59, 0, 2, 1);
+
+--
+-- Tetikleyiciler `user_info`
+--
+DELIMITER //
+CREATE TRIGGER `user_create` BEFORE INSERT ON `user_info`
+ FOR EACH ROW BEGIN
+
+   DECLARE actor int;
+
+   SELECT new.user_id INTO actor;
+
+   insert into actors values (actor,null);
+   
+END
+//
+DELIMITER ;
 
 -- --------------------------------------------------------
 
@@ -820,7 +849,7 @@ ALTER TABLE `category`
 -- Tablo için indeksler `chat`
 --
 ALTER TABLE `chat`
- ADD PRIMARY KEY (`id`);
+ ADD PRIMARY KEY (`id`), ADD KEY `chat_created_by` (`created_by`);
 
 --
 -- Tablo için indeksler `city`
@@ -911,6 +940,12 @@ ALTER TABLE `fav_artists`
 --
 ALTER TABLE `fav_movie`
  ADD PRIMARY KEY (`id`), ADD UNIQUE KEY `movie` (`movie`,`profile_id`);
+
+--
+-- Tablo için indeksler `follows`
+--
+ALTER TABLE `follows`
+ ADD PRIMARY KEY (`one`,`two`), ADD KEY `followee_actor` (`two`);
 
 --
 -- Tablo için indeksler `friend`
@@ -1012,31 +1047,37 @@ ALTER TABLE `phone_types`
 -- Tablo için indeksler `picture`
 --
 ALTER TABLE `picture`
- ADD PRIMARY KEY (`id`), ADD KEY `post_privacy` (`privacy`) COMMENT 'To whom the post is visible', ADD KEY `posted_by` (`posted_by`);
+ ADD PRIMARY KEY (`id`), ADD KEY `post_privacy` (`privacy`) COMMENT 'To whom the post is visible';
 
 --
--- Tablo için indeksler `privacy_target`
+-- Tablo için indeksler `post`
 --
-ALTER TABLE `privacy_target`
- ADD PRIMARY KEY (`target_id`), ADD KEY `minus` (`minus`);
+ALTER TABLE `post`
+ ADD PRIMARY KEY (`post_id`), ADD UNIQUE KEY `posted_by` (`actor_id`);
 
 --
 -- Tablo için indeksler `reply`
 --
 ALTER TABLE `reply`
- ADD PRIMARY KEY (`id`);
+ ADD PRIMARY KEY (`id`), ADD KEY `is_reply_of` (`status_id`);
 
 --
 -- Tablo için indeksler `status`
 --
 ALTER TABLE `status`
- ADD PRIMARY KEY (`id`), ADD KEY `status_update_by` (`user_id`), ADD KEY `status_target` (`privacy`);
+ ADD PRIMARY KEY (`id`), ADD KEY `status_target` (`privacy`);
 
 --
 -- Tablo için indeksler `tags`
 --
 ALTER TABLE `tags`
  ADD PRIMARY KEY (`id`), ADD KEY `tagged_by` (`who_id`), ADD KEY `tagged` (`tag_id`), ADD KEY `tagged_in` (`post_id`);
+
+--
+-- Tablo için indeksler `timeline`
+--
+ALTER TABLE `timeline`
+ ADD PRIMARY KEY (`actor_id`,`post_id`), ADD KEY `post_subject` (`post_id`);
 
 --
 -- Tablo için indeksler `user_info`
@@ -1064,7 +1105,7 @@ ALTER TABLE `want_ad`
 -- Tablo için AUTO_INCREMENT değeri `actors`
 --
 ALTER TABLE `actors`
-MODIFY `actor_id` int(11) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=63;
+MODIFY `actor_id` int(11) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=65;
 --
 -- Tablo için AUTO_INCREMENT değeri `employer`
 --
@@ -1123,17 +1164,24 @@ ADD CONSTRAINT `employer_user` FOREIGN KEY (`employer_user`) REFERENCES `user_in
 -- Tablo kısıtlamaları `employment`
 --
 ALTER TABLE `employment`
-ADD CONSTRAINT `employee_job_type` FOREIGN KEY (`job_type`) REFERENCES `job_type` (`job_type_page`) ON DELETE SET NULL ON UPDATE CASCADE,
 ADD CONSTRAINT `curriculumvitae_ref` FOREIGN KEY (`curriculumvitae`) REFERENCES `curriculumvitae` (`cv_id`),
+ADD CONSTRAINT `employee_job_type` FOREIGN KEY (`job_type`) REFERENCES `job_type` (`job_type_page`) ON DELETE SET NULL ON UPDATE CASCADE,
 ADD CONSTRAINT `employee_ref` FOREIGN KEY (`employee`) REFERENCES `user_info` (`user_id`),
 ADD CONSTRAINT `employment_employer` FOREIGN KEY (`employer`) REFERENCES `employer` (`employer_id`);
+
+--
+-- Tablo kısıtlamaları `follows`
+--
+ALTER TABLE `follows`
+ADD CONSTRAINT `followee_actor` FOREIGN KEY (`two`) REFERENCES `actors` (`actor_id`),
+ADD CONSTRAINT `follower_user` FOREIGN KEY (`one`) REFERENCES `user_info` (`user_id`);
 
 --
 -- Tablo kısıtlamaları `friend_list`
 --
 ALTER TABLE `friend_list`
-ADD CONSTRAINT `friend_list_visibility` FOREIGN KEY (`privacy`) REFERENCES `privacy_target` (`target_id`),
-ADD CONSTRAINT `friend_list_as_a_privacy_target` FOREIGN KEY (`id`) REFERENCES `privacy_target` (`target_id`);
+ADD CONSTRAINT `friend_list_as_an_actor` FOREIGN KEY (`id`) REFERENCES `actors` (`actor_id`),
+ADD CONSTRAINT `friend_list_visibility` FOREIGN KEY (`privacy`) REFERENCES `actors` (`actor_id`);
 
 --
 -- Tablo kısıtlamaları `groups`
@@ -1165,43 +1213,56 @@ ADD CONSTRAINT `page_actor` FOREIGN KEY (`pagenumber`) REFERENCES `actors` (`act
 -- Tablo kısıtlamaları `page_ownership`
 --
 ALTER TABLE `page_ownership`
-ADD CONSTRAINT `page_created_by` FOREIGN KEY (`created_by`) REFERENCES `user_info` (`user_id`),
-ADD CONSTRAINT `owned_page_existing` FOREIGN KEY (`pagenumber`) REFERENCES `page_generic` (`pagenumber`);
+ADD CONSTRAINT `owned_page_existing` FOREIGN KEY (`pagenumber`) REFERENCES `page_generic` (`pagenumber`),
+ADD CONSTRAINT `page_created_by` FOREIGN KEY (`created_by`) REFERENCES `user_info` (`user_id`);
 
 --
 -- Tablo kısıtlamaları `picture`
 --
 ALTER TABLE `picture`
-ADD CONSTRAINT `privacy_target` FOREIGN KEY (`privacy`) REFERENCES `privacy_target` (`target_id`),
-ADD CONSTRAINT `poster` FOREIGN KEY (`posted_by`) REFERENCES `actors` (`actor_id`);
+ADD CONSTRAINT `picture_activity` FOREIGN KEY (`id`) REFERENCES `post` (`post_id`),
+ADD CONSTRAINT `privacy_target` FOREIGN KEY (`privacy`) REFERENCES `actors` (`actor_id`);
 
 --
--- Tablo kısıtlamaları `privacy_target`
+-- Tablo kısıtlamaları `post`
 --
-ALTER TABLE `privacy_target`
-ADD CONSTRAINT `target_excluding` FOREIGN KEY (`minus`) REFERENCES `privacy_target` (`target_id`);
+ALTER TABLE `post`
+ADD CONSTRAINT `posted_by` FOREIGN KEY (`actor_id`) REFERENCES `actors` (`actor_id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+--
+-- Tablo kısıtlamaları `reply`
+--
+ALTER TABLE `reply`
+ADD CONSTRAINT `is_reply_of` FOREIGN KEY (`status_id`) REFERENCES `post` (`post_id`);
 
 --
 -- Tablo kısıtlamaları `status`
 --
 ALTER TABLE `status`
-ADD CONSTRAINT `status_target` FOREIGN KEY (`privacy`) REFERENCES `privacy_target` (`target_id`),
-ADD CONSTRAINT `status_update_by` FOREIGN KEY (`user_id`) REFERENCES `actors` (`actor_id`);
+ADD CONSTRAINT `status_activity` FOREIGN KEY (`id`) REFERENCES `post` (`post_id`),
+ADD CONSTRAINT `status_target` FOREIGN KEY (`privacy`) REFERENCES `actors` (`actor_id`);
 
 --
 -- Tablo kısıtlamaları `tags`
 --
 ALTER TABLE `tags`
-ADD CONSTRAINT `tagged_in` FOREIGN KEY (`post_id`) REFERENCES `picture` (`id`),
 ADD CONSTRAINT `tagged` FOREIGN KEY (`tag_id`) REFERENCES `user_info` (`user_id`),
-ADD CONSTRAINT `tagged_by` FOREIGN KEY (`who_id`) REFERENCES `actors` (`actor_id`);
+ADD CONSTRAINT `tagged_by` FOREIGN KEY (`who_id`) REFERENCES `actors` (`actor_id`),
+ADD CONSTRAINT `tagged_in` FOREIGN KEY (`post_id`) REFERENCES `picture` (`id`);
+
+--
+-- Tablo kısıtlamaları `timeline`
+--
+ALTER TABLE `timeline`
+ADD CONSTRAINT `post_subject` FOREIGN KEY (`post_id`) REFERENCES `actors` (`actor_id`),
+ADD CONSTRAINT `timeline_tp` FOREIGN KEY (`actor_id`) REFERENCES `actors` (`actor_id`);
 
 --
 -- Tablo kısıtlamaları `user_info`
 --
 ALTER TABLE `user_info`
+ADD CONSTRAINT `user_actor` FOREIGN KEY (`user_id`) REFERENCES `actors` (`actor_id`) ON UPDATE CASCADE,
 ADD CONSTRAINT `religion` FOREIGN KEY (`religion`) REFERENCES `page_generic` (`pagenumber`),
-ADD CONSTRAINT `user_actor` FOREIGN KEY (`user_id`) REFERENCES `actors` (`actor_id`) ON DELETE CASCADE,
 ADD CONSTRAINT `user_address` FOREIGN KEY (`address`) REFERENCES `address` (`address_id`),
 ADD CONSTRAINT `user_email` FOREIGN KEY (`mail`) REFERENCES `emails` (`email_id`) ON UPDATE CASCADE,
 ADD CONSTRAINT `user_gender` FOREIGN KEY (`gender`) REFERENCES `gender` (`gender_id`) ON UPDATE CASCADE,
