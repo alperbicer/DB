@@ -3,7 +3,7 @@
 -- http://www.phpmyadmin.net
 --
 -- Anamakine: localhost
--- Üretim Zamanı: 22 Ara 2014, 09:50:51
+-- Üretim Zamanı: 22 Ara 2014, 11:26:32
 -- Sunucu sürümü: 5.5.40-0ubuntu1
 -- PHP Sürümü: 5.5.12-2ubuntu5
 
@@ -19,6 +19,20 @@ SET time_zone = "+00:00";
 --
 -- Veritabanı: `social`
 --
+
+DELIMITER $$
+--
+-- İşlevler
+--
+CREATE DEFINER=`root`@`localhost` FUNCTION `get_total_like_score_post`(`a` INT) RETURNS int(11)
+    READS SQL DATA
+return (select sum(likescore) from social.like_dislike where post_id=a)$$
+
+CREATE DEFINER=`root`@`localhost` FUNCTION `get_total_like_score_user`(`id` INT) RETURNS int(11)
+    NO SQL
+return (select sum(likescore) from like_dislike where who_id=id)$$
+
+DELIMITER ;
 
 -- --------------------------------------------------------
 
@@ -74,7 +88,20 @@ CREATE TABLE IF NOT EXISTS `address` (
 --
 
 INSERT INTO `address` (`address_id`, `door`, `buildingname`, `street`, `avenue`, `boulevard`, `locality`, `neighbourhood`, `village`, `county`, `township`, `town`, `city`, `province`, `state`, `confederate`, `country`) VALUES
-(1, 17, NULL, '1909. Sokak', '1912. Sokak', 'Nursultan Nazarbayev Caddesi', NULL, 'Bayraklı Mahallesi', NULL, 'Smyrna', 'Bayraklı 3. Yerleşim Bölgesi', 2, 1, 1, 5, NULL, 'TUR');
+(1, 17, NULL, '1909. Sokak', '1912. Sokak', 'Nursultan Nazarbayev Caddesi', NULL, 'Bayraklı Mahallesi', NULL, 'Smyrna', 'Bayraklı 3. Yerleşim Bölgesi', 2, 1, 1, 5, NULL, 'TUR');
+
+-- --------------------------------------------------------
+
+--
+-- Tablo için tablo yapısı `block`
+--
+
+CREATE TABLE IF NOT EXISTS `block` (
+  `blocker` int(11) NOT NULL,
+  `blockee` int(11) NOT NULL,
+  `date_created` date NOT NULL,
+  `date_dropped` date DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf32 COLLATE=utf32_turkish_ci;
 
 -- --------------------------------------------------------
 
@@ -98,19 +125,6 @@ CREATE TABLE IF NOT EXISTS `chat` (
   `to` int(11) NOT NULL,
   `created_at` date NOT NULL,
   `user_id` int(11) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf32 COLLATE=utf32_turkish_ci;
-
--- --------------------------------------------------------
-
---
--- Tablo için tablo yapısı `cirriculumvitae`
---
-
-CREATE TABLE IF NOT EXISTS `cirriculumvitae` (
-  `cv_id` int(11) NOT NULL,
-  `curriculum` longtext COLLATE utf32_turkish_ci NOT NULL,
-  `created_on` date NOT NULL,
-  `dropped_on` date NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf32 COLLATE=utf32_turkish_ci;
 
 -- --------------------------------------------------------
@@ -170,7 +184,7 @@ CREATE TABLE IF NOT EXISTS `connections` (
 --
 
 CREATE TABLE IF NOT EXISTS `country` (
-  `id` char(3) COLLATE utf32_turkish_ci NOT NULL COMMENT 'ISO Ülke Kodu',
+  `id` char(3) COLLATE utf32_turkish_ci NOT NULL COMMENT 'ISO Ülke Kodu',
   `country` varchar(80) COLLATE utf32_turkish_ci NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf32 COLLATE=utf32_turkish_ci;
 
@@ -182,6 +196,69 @@ INSERT INTO `country` (`id`, `country`) VALUES
 ('KTC', 'Kuzey Kıbrıs Türk Cumhuriyeti'),
 ('TUR', 'Turkey'),
 ('USA', 'United States of America');
+
+-- --------------------------------------------------------
+
+--
+-- Tablo için tablo yapısı `curriculumvitae`
+--
+
+CREATE TABLE IF NOT EXISTS `curriculumvitae` (
+  `cv_id` int(11) NOT NULL,
+  `curriculum` longtext COLLATE utf32_turkish_ci NOT NULL,
+  `vitae` int(11) NOT NULL,
+  `created_on` date NOT NULL,
+  `dropped_on` date NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf32 COLLATE=utf32_turkish_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Tablo için tablo yapısı `curriculumvitae_attachment`
+--
+
+CREATE TABLE IF NOT EXISTS `curriculumvitae_attachment` (
+  `attachment_id` int(11) NOT NULL,
+  `cv_id` int(11) NOT NULL,
+  `type` int(11) NOT NULL,
+  `attachment_url` text COLLATE utf32_turkish_ci,
+  `description` longtext COLLATE utf32_turkish_ci NOT NULL,
+  `attachment_created` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf32 COLLATE=utf32_turkish_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Tablo için tablo yapısı `curriculumvitae_attachment_types`
+--
+
+CREATE TABLE IF NOT EXISTS `curriculumvitae_attachment_types` (
+  `type` int(11) NOT NULL,
+  `summary` varchar(255) COLLATE utf32_turkish_ci NOT NULL,
+  `description` text COLLATE utf32_turkish_ci NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf32 COLLATE=utf32_turkish_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Tablo için tablo yapısı `curriculumvitae_employment_entry`
+--
+
+CREATE TABLE IF NOT EXISTS `curriculumvitae_employment_entry` (
+  `cv_attachment_id` int(11) NOT NULL,
+  `employment_id` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf32 COLLATE=utf32_turkish_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Tablo için tablo yapısı `curriculumvitae_volunteering_entry`
+--
+
+CREATE TABLE IF NOT EXISTS `curriculumvitae_volunteering_entry` (
+  `curriculumvitae` int(11) NOT NULL,
+  `volunteering_id` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf32 COLLATE=utf32_turkish_ci;
 
 -- --------------------------------------------------------
 
@@ -237,6 +314,7 @@ CREATE TABLE IF NOT EXISTS `employment` (
   `employment_id` int(11) NOT NULL,
   `employer` int(11) NOT NULL,
   `employee` int(11) NOT NULL,
+  `curriculumvitae` int(11) NOT NULL,
   `date_started` int(11) NOT NULL,
   `date_quit` int(11) DEFAULT NULL,
   `fired` tinyint(1) NOT NULL DEFAULT '0'
@@ -473,10 +551,10 @@ INSERT INTO `marital_status` (`marital_status_id`, `marital_status_name`) VALUES
 (3, 'Widow'),
 (4, 'Muslim sexual servant'),
 (5, 'African sexual servant'),
-(6, 'Unpaid slave worker'),
-(7, 'Irreproducible Robot'),
+(6, 'Illegal sexual servant'),
+(7, 'Unpaid slave worker'),
 (8, 'Nonhuman intelligent animal'),
-(9, 'Illegal sexual servant');
+(9, 'Irreproducible Robot');
 
 -- --------------------------------------------------------
 
@@ -587,22 +665,23 @@ CREATE TABLE IF NOT EXISTS `picture` (
 --
 
 CREATE TABLE IF NOT EXISTS `privacy_target` (
-  `target_id` int(11) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+  `target_id` int(11) NOT NULL,
+  `minus` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf32 COLLATE=utf32_turkish_ci;
 
 --
 -- Tablo döküm verisi `privacy_target`
 --
 
-INSERT INTO `privacy_target` (`target_id`) VALUES
-(0),
-(1),
-(57),
-(58),
-(59),
-(60),
-(61),
-(62);
+INSERT INTO `privacy_target` (`target_id`, `minus`) VALUES
+(0, 0),
+(1, 0),
+(57, 0),
+(58, 0),
+(59, 0),
+(60, 0),
+(61, 0),
+(62, 0);
 
 -- --------------------------------------------------------
 
@@ -682,6 +761,20 @@ INSERT INTO `user_info` (`user_id`, `date_joined`, `date_of_birth`, `givenname`,
 -- --------------------------------------------------------
 
 --
+-- Tablo için tablo yapısı `volunteers`
+--
+
+CREATE TABLE IF NOT EXISTS `volunteers` (
+  `volunteering_id` int(11) NOT NULL,
+  `volunteer` int(11) NOT NULL,
+  `voluntree` int(11) NOT NULL COMMENT 'group volunteered in behalf of',
+  `date_started` date NOT NULL,
+  `date_dropped` date NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf32 COLLATE=utf32_turkish_ci;
+
+-- --------------------------------------------------------
+
+--
 -- Tablo için tablo yapısı `want_ad`
 --
 
@@ -711,6 +804,12 @@ ALTER TABLE `address`
  ADD PRIMARY KEY (`address_id`);
 
 --
+-- Tablo için indeksler `block`
+--
+ALTER TABLE `block`
+ ADD PRIMARY KEY (`blocker`,`blockee`), ADD KEY `blockee` (`blockee`);
+
+--
 -- Tablo için indeksler `category`
 --
 ALTER TABLE `category`
@@ -721,12 +820,6 @@ ALTER TABLE `category`
 --
 ALTER TABLE `chat`
  ADD PRIMARY KEY (`id`);
-
---
--- Tablo için indeksler `cirriculumvitae`
---
-ALTER TABLE `cirriculumvitae`
- ADD PRIMARY KEY (`cv_id`);
 
 --
 -- Tablo için indeksler `city`
@@ -753,6 +846,30 @@ ALTER TABLE `country`
  ADD PRIMARY KEY (`id`);
 
 --
+-- Tablo için indeksler `curriculumvitae`
+--
+ALTER TABLE `curriculumvitae`
+ ADD PRIMARY KEY (`cv_id`), ADD UNIQUE KEY `cv_ownership` (`vitae`);
+
+--
+-- Tablo için indeksler `curriculumvitae_attachment`
+--
+ALTER TABLE `curriculumvitae_attachment`
+ ADD PRIMARY KEY (`attachment_id`), ADD KEY `cv_attachment_ref` (`cv_id`);
+
+--
+-- Tablo için indeksler `curriculumvitae_employment_entry`
+--
+ALTER TABLE `curriculumvitae_employment_entry`
+ ADD PRIMARY KEY (`cv_attachment_id`), ADD UNIQUE KEY `curriculumvitae_employment` (`employment_id`);
+
+--
+-- Tablo için indeksler `curriculumvitae_volunteering_entry`
+--
+ALTER TABLE `curriculumvitae_volunteering_entry`
+ ADD PRIMARY KEY (`curriculumvitae`), ADD UNIQUE KEY `curriculumvitae_volunteering` (`volunteering_id`);
+
+--
 -- Tablo için indeksler `education`
 --
 ALTER TABLE `education`
@@ -774,7 +891,7 @@ ALTER TABLE `employer`
 -- Tablo için indeksler `employment`
 --
 ALTER TABLE `employment`
- ADD KEY `employer_ref` (`employer`), ADD KEY `employee` (`employee`);
+ ADD PRIMARY KEY (`employment_id`), ADD KEY `employer_ref` (`employer`), ADD KEY `employee` (`employee`), ADD KEY `employer` (`employer`,`employee`), ADD KEY `curriculumvitae_referenced` (`curriculumvitae`);
 
 --
 -- Tablo için indeksler `fav_animals`
@@ -900,7 +1017,7 @@ ALTER TABLE `picture`
 -- Tablo için indeksler `privacy_target`
 --
 ALTER TABLE `privacy_target`
- ADD PRIMARY KEY (`target_id`);
+ ADD PRIMARY KEY (`target_id`), ADD KEY `minus` (`minus`);
 
 --
 -- Tablo için indeksler `reply`
@@ -925,6 +1042,12 @@ ALTER TABLE `tags`
 --
 ALTER TABLE `user_info`
  ADD PRIMARY KEY (`user_id`), ADD KEY `mail` (`mail`) COMMENT 'user_email', ADD KEY `user_gender` (`gender`), ADD KEY `user_marital` (`marital_status_code`), ADD KEY `user_address` (`address`), ADD KEY `religion` (`religion`), ADD KEY `user_locale` (`lang`);
+
+--
+-- Tablo için indeksler `volunteers`
+--
+ALTER TABLE `volunteers`
+ ADD PRIMARY KEY (`volunteering_id`), ADD KEY `volunteer` (`volunteer`), ADD KEY `voluntree` (`voluntree`);
 
 --
 -- Tablo için indeksler `want_ad`
@@ -956,6 +1079,39 @@ MODIFY `marital_status_id` smallint(6) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=10
 --
 
 --
+-- Tablo kısıtlamaları `block`
+--
+ALTER TABLE `block`
+ADD CONSTRAINT `blockee` FOREIGN KEY (`blockee`) REFERENCES `user_info` (`user_id`),
+ADD CONSTRAINT `blocker` FOREIGN KEY (`blocker`) REFERENCES `user_info` (`user_id`);
+
+--
+-- Tablo kısıtlamaları `curriculumvitae`
+--
+ALTER TABLE `curriculumvitae`
+ADD CONSTRAINT `curriculumvitae_ownership` FOREIGN KEY (`vitae`) REFERENCES `user_info` (`user_id`);
+
+--
+-- Tablo kısıtlamaları `curriculumvitae_attachment`
+--
+ALTER TABLE `curriculumvitae_attachment`
+ADD CONSTRAINT `curriculumvitae_attached_to` FOREIGN KEY (`cv_id`) REFERENCES `curriculumvitae` (`cv_id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+--
+-- Tablo kısıtlamaları `curriculumvitae_employment_entry`
+--
+ALTER TABLE `curriculumvitae_employment_entry`
+ADD CONSTRAINT `curriculumvitae_employment_id` FOREIGN KEY (`employment_id`) REFERENCES `employment` (`employment_id`),
+ADD CONSTRAINT `employment_curriculumvitae_ref` FOREIGN KEY (`cv_attachment_id`) REFERENCES `curriculumvitae_attachment` (`attachment_id`);
+
+--
+-- Tablo kısıtlamaları `curriculumvitae_volunteering_entry`
+--
+ALTER TABLE `curriculumvitae_volunteering_entry`
+ADD CONSTRAINT `curriculumvitae_volunteering` FOREIGN KEY (`volunteering_id`) REFERENCES `volunteers` (`volunteering_id`),
+ADD CONSTRAINT `volunteers_curriculumvitae` FOREIGN KEY (`curriculumvitae`) REFERENCES `curriculumvitae` (`cv_id`);
+
+--
 -- Tablo kısıtlamaları `employer`
 --
 ALTER TABLE `employer`
@@ -966,6 +1122,7 @@ ADD CONSTRAINT `employer_user` FOREIGN KEY (`employer_user`) REFERENCES `user_in
 -- Tablo kısıtlamaları `employment`
 --
 ALTER TABLE `employment`
+ADD CONSTRAINT `curriculumvitae_ref` FOREIGN KEY (`curriculumvitae`) REFERENCES `curriculumvitae` (`cv_id`),
 ADD CONSTRAINT `employee_ref` FOREIGN KEY (`employee`) REFERENCES `user_info` (`user_id`),
 ADD CONSTRAINT `employment_employer` FOREIGN KEY (`employer`) REFERENCES `employer` (`employer_id`);
 
@@ -1017,6 +1174,12 @@ ADD CONSTRAINT `privacy_target` FOREIGN KEY (`privacy`) REFERENCES `privacy_targ
 ADD CONSTRAINT `poster` FOREIGN KEY (`posted_by`) REFERENCES `actors` (`actor_id`);
 
 --
+-- Tablo kısıtlamaları `privacy_target`
+--
+ALTER TABLE `privacy_target`
+ADD CONSTRAINT `target_excluding` FOREIGN KEY (`minus`) REFERENCES `privacy_target` (`target_id`);
+
+--
 -- Tablo kısıtlamaları `status`
 --
 ALTER TABLE `status`
@@ -1042,6 +1205,13 @@ ADD CONSTRAINT `user_email` FOREIGN KEY (`mail`) REFERENCES `emails` (`email_id`
 ADD CONSTRAINT `user_gender` FOREIGN KEY (`gender`) REFERENCES `gender` (`gender_id`) ON UPDATE CASCADE,
 ADD CONSTRAINT `user_lang` FOREIGN KEY (`lang`) REFERENCES `lang` (`id`),
 ADD CONSTRAINT `user_marital` FOREIGN KEY (`marital_status_code`) REFERENCES `marital_status` (`marital_status_id`) ON UPDATE CASCADE;
+
+--
+-- Tablo kısıtlamaları `volunteers`
+--
+ALTER TABLE `volunteers`
+ADD CONSTRAINT `volunteer_user` FOREIGN KEY (`volunteer`) REFERENCES `user_info` (`user_id`) ON DELETE CASCADE,
+ADD CONSTRAINT `voluntree_group` FOREIGN KEY (`voluntree`) REFERENCES `groups` (`group_id`) ON UPDATE CASCADE;
 
 --
 -- Tablo kısıtlamaları `want_ad`
