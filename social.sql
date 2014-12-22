@@ -3,7 +3,7 @@
 -- http://www.phpmyadmin.net
 --
 -- Anamakine: localhost
--- Üretim Zamanı: 22 Ara 2014, 11:26:32
+-- Üretim Zamanı: 22 Ara 2014, 11:39:18
 -- Sunucu sürümü: 5.5.40-0ubuntu1
 -- PHP Sürümü: 5.5.12-2ubuntu5
 
@@ -314,7 +314,8 @@ CREATE TABLE IF NOT EXISTS `employment` (
   `employment_id` int(11) NOT NULL,
   `employer` int(11) NOT NULL,
   `employee` int(11) NOT NULL,
-  `curriculumvitae` int(11) NOT NULL,
+  `job_type` int(11) DEFAULT NULL,
+  `curriculumvitae` int(11) DEFAULT NULL,
   `date_started` int(11) NOT NULL,
   `date_quit` int(11) DEFAULT NULL,
   `fired` tinyint(1) NOT NULL DEFAULT '0'
@@ -891,7 +892,7 @@ ALTER TABLE `employer`
 -- Tablo için indeksler `employment`
 --
 ALTER TABLE `employment`
- ADD PRIMARY KEY (`employment_id`), ADD KEY `employer_ref` (`employer`), ADD KEY `employee` (`employee`), ADD KEY `employer` (`employer`,`employee`), ADD KEY `curriculumvitae_referenced` (`curriculumvitae`);
+ ADD PRIMARY KEY (`employment_id`), ADD KEY `employer_ref` (`employer`), ADD KEY `employee` (`employee`), ADD KEY `employer` (`employer`,`employee`), ADD KEY `curriculumvitae_referenced` (`curriculumvitae`), ADD KEY `employee_works_on` (`job_type`);
 
 --
 -- Tablo için indeksler `fav_animals`
@@ -1122,6 +1123,7 @@ ADD CONSTRAINT `employer_user` FOREIGN KEY (`employer_user`) REFERENCES `user_in
 -- Tablo kısıtlamaları `employment`
 --
 ALTER TABLE `employment`
+ADD CONSTRAINT `employee_job_type` FOREIGN KEY (`job_type`) REFERENCES `job_type` (`job_type_page`) ON DELETE SET NULL ON UPDATE CASCADE,
 ADD CONSTRAINT `curriculumvitae_ref` FOREIGN KEY (`curriculumvitae`) REFERENCES `curriculumvitae` (`cv_id`),
 ADD CONSTRAINT `employee_ref` FOREIGN KEY (`employee`) REFERENCES `user_info` (`user_id`),
 ADD CONSTRAINT `employment_employer` FOREIGN KEY (`employer`) REFERENCES `employer` (`employer_id`);
