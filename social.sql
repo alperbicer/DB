@@ -3,7 +3,7 @@
 -- http://www.phpmyadmin.net
 --
 -- Anamakine: localhost
--- Üretim Zamanı: 22 Ara 2014, 17:41:05
+-- Üretim Zamanı: 27 Ara 2014, 12:41:06
 -- Sunucu sürümü: 5.5.40-0ubuntu1
 -- PHP Sürümü: 5.5.12-2ubuntu5
 
@@ -599,7 +599,8 @@ CREATE TABLE IF NOT EXISTS `notification` (
   `created_at` date NOT NULL,
   `status` varchar(50) COLLATE utf32_turkish_ci NOT NULL,
   `user_id` int(11) NOT NULL,
-  `who` int(11) NOT NULL
+  `who` int(11) NOT NULL,
+  `is_read` bit(1) NOT NULL DEFAULT b'0'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf32 COLLATE=utf32_turkish_ci;
 
 -- --------------------------------------------------------
@@ -861,7 +862,7 @@ ALTER TABLE `city`
 -- Tablo için indeksler `comments`
 --
 ALTER TABLE `comments`
- ADD PRIMARY KEY (`id`), ADD KEY `comment_created_by` (`created_by`) COMMENT 'User, group or page can comment';
+ ADD PRIMARY KEY (`id`), ADD UNIQUE KEY `comment_post` (`post_id`), ADD KEY `comment_created_by` (`created_by`) COMMENT 'User, group or page can comment';
 
 --
 -- Tablo için indeksler `connections`
@@ -1128,6 +1129,13 @@ ADD CONSTRAINT `blockee` FOREIGN KEY (`blockee`) REFERENCES `user_info` (`user_i
 ADD CONSTRAINT `blocker` FOREIGN KEY (`blocker`) REFERENCES `user_info` (`user_id`);
 
 --
+-- Tablo kısıtlamaları `comments`
+--
+ALTER TABLE `comments`
+ADD CONSTRAINT `comment_activity` FOREIGN KEY (`id`) REFERENCES `actors` (`actor_id`),
+ADD CONSTRAINT `comment_refers_to` FOREIGN KEY (`post_id`) REFERENCES `post` (`post_id`);
+
+--
 -- Tablo kısıtlamaları `curriculumvitae`
 --
 ALTER TABLE `curriculumvitae`
@@ -1261,8 +1269,8 @@ ADD CONSTRAINT `timeline_tp` FOREIGN KEY (`actor_id`) REFERENCES `actors` (`acto
 -- Tablo kısıtlamaları `user_info`
 --
 ALTER TABLE `user_info`
-ADD CONSTRAINT `user_actor` FOREIGN KEY (`user_id`) REFERENCES `actors` (`actor_id`) ON UPDATE CASCADE,
 ADD CONSTRAINT `religion` FOREIGN KEY (`religion`) REFERENCES `page_generic` (`pagenumber`),
+ADD CONSTRAINT `user_actor` FOREIGN KEY (`user_id`) REFERENCES `actors` (`actor_id`) ON UPDATE CASCADE,
 ADD CONSTRAINT `user_address` FOREIGN KEY (`address`) REFERENCES `address` (`address_id`),
 ADD CONSTRAINT `user_email` FOREIGN KEY (`mail`) REFERENCES `emails` (`email_id`) ON UPDATE CASCADE,
 ADD CONSTRAINT `user_gender` FOREIGN KEY (`gender`) REFERENCES `gender` (`gender_id`) ON UPDATE CASCADE,
