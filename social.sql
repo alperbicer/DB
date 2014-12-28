@@ -3,7 +3,7 @@
 -- http://www.phpmyadmin.net
 --
 -- Anamakine: localhost
--- Üretim Zamanı: 27 Ara 2014, 12:41:06
+-- Üretim Zamanı: 28 Ara 2014, 17:32:51
 -- Sunucu sürümü: 5.5.40-0ubuntu1
 -- PHP Sürümü: 5.5.12-2ubuntu5
 
@@ -580,10 +580,29 @@ CREATE TABLE IF NOT EXISTS `messages` (
   `id` int(11) NOT NULL,
   `message` mediumtext COLLATE utf32_turkish_ci NOT NULL,
   `created_at` date NOT NULL,
-  `is_read` int(11) NOT NULL,
+  `is_read` bit(1) NOT NULL,
   `is_spam` int(11) NOT NULL,
   `chat_id` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf32 COLLATE=utf32_turkish_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Tablo için tablo yapısı `muted_notifications`
+--
+
+CREATE TABLE IF NOT EXISTS `muted_notifications` (
+  `nfrom` int(11) NOT NULL,
+  `nto` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf32 COLLATE=utf32_turkish_ci;
+
+--
+-- Tablo döküm verisi `muted_notifications`
+--
+
+INSERT INTO `muted_notifications` (`nfrom`, `nto`) VALUES
+(57, 1),
+(58, 1);
 
 -- --------------------------------------------------------
 
@@ -1015,6 +1034,12 @@ ALTER TABLE `messages`
  ADD PRIMARY KEY (`id`);
 
 --
+-- Tablo için indeksler `muted_notifications`
+--
+ALTER TABLE `muted_notifications`
+ ADD PRIMARY KEY (`nfrom`,`nto`), ADD KEY `muted_to` (`nto`);
+
+--
 -- Tablo için indeksler `notification`
 --
 ALTER TABLE `notification`
@@ -1210,6 +1235,13 @@ ADD CONSTRAINT `group_ref` FOREIGN KEY (`group_id`) REFERENCES `groups` (`group_
 --
 ALTER TABLE `like_dislike`
 ADD CONSTRAINT `liked_by` FOREIGN KEY (`whois_id`) REFERENCES `actors` (`actor_id`);
+
+--
+-- Tablo kısıtlamaları `muted_notifications`
+--
+ALTER TABLE `muted_notifications`
+ADD CONSTRAINT `muted_to` FOREIGN KEY (`nto`) REFERENCES `user_info` (`user_id`) ON DELETE CASCADE ON UPDATE CASCADE,
+ADD CONSTRAINT `muted_from` FOREIGN KEY (`nfrom`) REFERENCES `actors` (`actor_id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
 -- Tablo kısıtlamaları `page_generic`
