@@ -1,11 +1,11 @@
 -- phpMyAdmin SQL Dump
--- version 4.2.12deb1
+-- version 4.0.10deb1
 -- http://www.phpmyadmin.net
 --
 -- Anamakine: localhost
--- Üretim Zamanı: 28 Ara 2014, 17:32:51
--- Sunucu sürümü: 5.5.40-0ubuntu1
--- PHP Sürümü: 5.5.12-2ubuntu5
+-- Üretim Zamanı: 28 Ara 2014, 17:43:13
+-- Sunucu sürümü: 5.5.40-0ubuntu0.14.04.1
+-- PHP Sürümü: 5.5.9-1ubuntu4.5
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 SET time_zone = "+00:00";
@@ -17,7 +17,7 @@ SET time_zone = "+00:00";
 /*!40101 SET NAMES utf8 */;
 
 --
--- Veritabanı: `social`
+-- Veritabanı: `DB3`
 --
 
 DELIMITER $$
@@ -45,9 +45,10 @@ DELIMITER ;
 --
 
 CREATE TABLE IF NOT EXISTS `actors` (
-`actor_id` int(11) NOT NULL,
-  `privacy_minus` int(11) DEFAULT NULL
-) ENGINE=InnoDB AUTO_INCREMENT=65 DEFAULT CHARSET=utf32 COLLATE=utf32_turkish_ci;
+  `actor_id` int(11) NOT NULL AUTO_INCREMENT,
+  `privacy_minus` int(11) DEFAULT NULL,
+  PRIMARY KEY (`actor_id`)
+) ENGINE=InnoDB  DEFAULT CHARSET=utf32 COLLATE=utf32_turkish_ci AUTO_INCREMENT=100 ;
 
 --
 -- Tablo döküm verisi `actors`
@@ -63,7 +64,9 @@ INSERT INTO `actors` (`actor_id`, `privacy_minus`) VALUES
 (61, NULL),
 (62, NULL),
 (63, NULL),
-(64, NULL);
+(64, NULL),
+(65, NULL),
+(99, NULL);
 
 -- --------------------------------------------------------
 
@@ -88,7 +91,8 @@ CREATE TABLE IF NOT EXISTS `address` (
   `province` int(11) DEFAULT NULL,
   `state` int(11) DEFAULT NULL,
   `confederate` int(11) DEFAULT NULL,
-  `country` char(3) COLLATE utf32_turkish_ci NOT NULL
+  `country` char(3) COLLATE utf32_turkish_ci NOT NULL,
+  PRIMARY KEY (`address_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf32 COLLATE=utf32_turkish_ci;
 
 --
@@ -109,7 +113,9 @@ CREATE TABLE IF NOT EXISTS `block` (
   `blocker` int(11) NOT NULL,
   `blockee` int(11) NOT NULL,
   `date_created` date NOT NULL,
-  `date_dropped` date DEFAULT NULL
+  `date_dropped` date DEFAULT NULL,
+  PRIMARY KEY (`blocker`,`blockee`),
+  KEY `blockee` (`blockee`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf32 COLLATE=utf32_turkish_ci;
 
 -- --------------------------------------------------------
@@ -120,7 +126,8 @@ CREATE TABLE IF NOT EXISTS `block` (
 
 CREATE TABLE IF NOT EXISTS `category` (
   `id` int(11) NOT NULL,
-  `name` varchar(255) COLLATE utf32_turkish_ci NOT NULL
+  `name` varchar(255) COLLATE utf32_turkish_ci NOT NULL,
+  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf32 COLLATE=utf32_turkish_ci;
 
 -- --------------------------------------------------------
@@ -133,7 +140,9 @@ CREATE TABLE IF NOT EXISTS `chat` (
   `id` int(11) NOT NULL,
   `to` int(11) NOT NULL,
   `created_at` date NOT NULL,
-  `created_by` int(11) NOT NULL
+  `created_by` int(11) NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `chat_created_by` (`created_by`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf32 COLLATE=utf32_turkish_ci;
 
 -- --------------------------------------------------------
@@ -144,7 +153,8 @@ CREATE TABLE IF NOT EXISTS `chat` (
 
 CREATE TABLE IF NOT EXISTS `city` (
   `id` int(11) NOT NULL,
-  `city` varchar(286) COLLATE utf32_turkish_ci NOT NULL
+  `city` varchar(286) COLLATE utf32_turkish_ci NOT NULL,
+  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf32 COLLATE=utf32_turkish_ci;
 
 --
@@ -171,7 +181,10 @@ CREATE TABLE IF NOT EXISTS `comments` (
   `id` int(11) NOT NULL,
   `comment` varchar(250) COLLATE utf32_turkish_ci NOT NULL,
   `post_id` int(11) NOT NULL,
-  `created_by` int(11) NOT NULL
+  `created_by` int(11) NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `comment_post` (`post_id`),
+  KEY `comment_created_by` (`created_by`) COMMENT 'User, group or page can comment'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf32 COLLATE=utf32_turkish_ci;
 
 -- --------------------------------------------------------
@@ -185,7 +198,9 @@ CREATE TABLE IF NOT EXISTS `connections` (
   `member_one` int(11) NOT NULL,
   `member_two` int(11) NOT NULL,
   `date_created` date NOT NULL,
-  `date_dropped` date NOT NULL
+  `date_dropped` date NOT NULL,
+  PRIMARY KEY (`connection_id`),
+  UNIQUE KEY `member_one` (`member_one`,`member_two`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf32 COLLATE=utf32_turkish_ci;
 
 -- --------------------------------------------------------
@@ -196,7 +211,8 @@ CREATE TABLE IF NOT EXISTS `connections` (
 
 CREATE TABLE IF NOT EXISTS `country` (
   `id` char(3) COLLATE utf32_turkish_ci NOT NULL COMMENT 'ISO Ülke Kodu',
-  `country` varchar(80) COLLATE utf32_turkish_ci NOT NULL
+  `country` varchar(80) COLLATE utf32_turkish_ci NOT NULL,
+  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf32 COLLATE=utf32_turkish_ci;
 
 --
@@ -219,7 +235,9 @@ CREATE TABLE IF NOT EXISTS `curriculumvitae` (
   `curriculum` longtext COLLATE utf32_turkish_ci NOT NULL,
   `vitae` int(11) NOT NULL,
   `created_on` date NOT NULL,
-  `dropped_on` date NOT NULL
+  `dropped_on` date NOT NULL,
+  PRIMARY KEY (`cv_id`),
+  UNIQUE KEY `cv_ownership` (`vitae`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf32 COLLATE=utf32_turkish_ci;
 
 -- --------------------------------------------------------
@@ -234,7 +252,9 @@ CREATE TABLE IF NOT EXISTS `curriculumvitae_attachment` (
   `type` int(11) NOT NULL,
   `attachment_url` text COLLATE utf32_turkish_ci,
   `description` longtext COLLATE utf32_turkish_ci NOT NULL,
-  `attachment_created` int(11) NOT NULL
+  `attachment_created` int(11) NOT NULL,
+  PRIMARY KEY (`attachment_id`),
+  KEY `cv_attachment_ref` (`cv_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf32 COLLATE=utf32_turkish_ci;
 
 -- --------------------------------------------------------
@@ -257,7 +277,9 @@ CREATE TABLE IF NOT EXISTS `curriculumvitae_attachment_types` (
 
 CREATE TABLE IF NOT EXISTS `curriculumvitae_employment_entry` (
   `cv_attachment_id` int(11) NOT NULL,
-  `employment_id` int(11) NOT NULL
+  `employment_id` int(11) NOT NULL,
+  PRIMARY KEY (`cv_attachment_id`),
+  UNIQUE KEY `curriculumvitae_employment` (`employment_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf32 COLLATE=utf32_turkish_ci;
 
 -- --------------------------------------------------------
@@ -268,7 +290,9 @@ CREATE TABLE IF NOT EXISTS `curriculumvitae_employment_entry` (
 
 CREATE TABLE IF NOT EXISTS `curriculumvitae_volunteering_entry` (
   `curriculumvitae` int(11) NOT NULL,
-  `volunteering_id` int(11) NOT NULL
+  `volunteering_id` int(11) NOT NULL,
+  PRIMARY KEY (`curriculumvitae`),
+  UNIQUE KEY `curriculumvitae_volunteering` (`volunteering_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf32 COLLATE=utf32_turkish_ci;
 
 -- --------------------------------------------------------
@@ -280,7 +304,8 @@ CREATE TABLE IF NOT EXISTS `curriculumvitae_volunteering_entry` (
 CREATE TABLE IF NOT EXISTS `education` (
   `id` int(11) NOT NULL,
   `education` varchar(50) COLLATE utf32_turkish_ci NOT NULL,
-  `profile_id` int(11) NOT NULL
+  `profile_id` int(11) NOT NULL,
+  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf32 COLLATE=utf32_turkish_ci;
 
 -- --------------------------------------------------------
@@ -291,7 +316,8 @@ CREATE TABLE IF NOT EXISTS `education` (
 
 CREATE TABLE IF NOT EXISTS `emails` (
   `email_id` int(11) NOT NULL,
-  `email_textual` varchar(50) COLLATE utf32_turkish_ci NOT NULL
+  `email_textual` varchar(50) COLLATE utf32_turkish_ci NOT NULL,
+  PRIMARY KEY (`email_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf32 COLLATE=utf32_turkish_ci;
 
 --
@@ -310,11 +336,15 @@ INSERT INTO `emails` (`email_id`, `email_textual`) VALUES
 --
 
 CREATE TABLE IF NOT EXISTS `employer` (
-`employer_id` int(11) NOT NULL,
+  `employer_id` int(11) NOT NULL AUTO_INCREMENT,
   `employer_user` int(11) NOT NULL,
   `employer_page` int(11) NOT NULL,
-  `description` text COLLATE utf32_turkish_ci
-) ENGINE=InnoDB DEFAULT CHARSET=utf32 COLLATE=utf32_turkish_ci;
+  `description` text COLLATE utf32_turkish_ci,
+  PRIMARY KEY (`employer_id`),
+  UNIQUE KEY `employer_user_2` (`employer_user`,`employer_page`),
+  KEY `employer_user` (`employer_user`),
+  KEY `employer_company` (`employer_page`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf32 COLLATE=utf32_turkish_ci AUTO_INCREMENT=1 ;
 
 -- --------------------------------------------------------
 
@@ -330,7 +360,13 @@ CREATE TABLE IF NOT EXISTS `employment` (
   `curriculumvitae` int(11) DEFAULT NULL,
   `date_started` int(11) NOT NULL,
   `date_quit` int(11) DEFAULT NULL,
-  `fired` tinyint(1) NOT NULL DEFAULT '0'
+  `fired` tinyint(1) NOT NULL DEFAULT '0',
+  PRIMARY KEY (`employment_id`),
+  KEY `employer_ref` (`employer`),
+  KEY `employee` (`employee`),
+  KEY `employer` (`employer`,`employee`),
+  KEY `curriculumvitae_referenced` (`curriculumvitae`),
+  KEY `employee_works_on` (`job_type`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf32 COLLATE=utf32_turkish_ci;
 
 -- --------------------------------------------------------
@@ -342,7 +378,9 @@ CREATE TABLE IF NOT EXISTS `employment` (
 CREATE TABLE IF NOT EXISTS `fav_animals` (
   `id` int(11) NOT NULL,
   `animal` varchar(80) COLLATE utf32_turkish_ci NOT NULL,
-  `profile_id` int(11) NOT NULL
+  `profile_id` int(11) NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `animal` (`animal`,`profile_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf32 COLLATE=utf32_turkish_ci;
 
 -- --------------------------------------------------------
@@ -354,7 +392,9 @@ CREATE TABLE IF NOT EXISTS `fav_animals` (
 CREATE TABLE IF NOT EXISTS `fav_artists` (
   `id` int(11) NOT NULL,
   `artist` varchar(80) COLLATE utf32_turkish_ci NOT NULL,
-  `profile_id` int(11) NOT NULL
+  `profile_id` int(11) NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `artist` (`artist`,`profile_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf32 COLLATE=utf32_turkish_ci;
 
 -- --------------------------------------------------------
@@ -378,7 +418,9 @@ CREATE TABLE IF NOT EXISTS `fav_books` (
 CREATE TABLE IF NOT EXISTS `fav_movie` (
   `id` int(11) NOT NULL,
   `movie` varchar(80) COLLATE utf32_turkish_ci NOT NULL,
-  `profile_id` int(11) NOT NULL
+  `profile_id` int(11) NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `movie` (`movie`,`profile_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf32 COLLATE=utf32_turkish_ci;
 
 -- --------------------------------------------------------
@@ -389,7 +431,9 @@ CREATE TABLE IF NOT EXISTS `fav_movie` (
 
 CREATE TABLE IF NOT EXISTS `follows` (
   `one` int(11) NOT NULL,
-  `two` int(11) NOT NULL
+  `two` int(11) NOT NULL,
+  PRIMARY KEY (`one`,`two`),
+  KEY `followee_actor` (`two`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf32 COLLATE=utf32_turkish_ci;
 
 -- --------------------------------------------------------
@@ -404,7 +448,9 @@ CREATE TABLE IF NOT EXISTS `friend` (
   `is_subscriber` int(11) NOT NULL,
   `created_at` int(11) NOT NULL,
   `user_id` int(11) NOT NULL,
-  `friend_list_id` int(11) NOT NULL
+  `friend_list_id` int(11) NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `friend_user_id` (`friend_user_id`,`user_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf32 COLLATE=utf32_turkish_ci;
 
 -- --------------------------------------------------------
@@ -417,7 +463,9 @@ CREATE TABLE IF NOT EXISTS `friend_list` (
   `id` int(11) NOT NULL,
   `name` varchar(50) COLLATE utf32_turkish_ci NOT NULL,
   `privacy` int(11) NOT NULL,
-  `user_id` int(11) NOT NULL
+  `user_id` int(11) NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `friendlist_target` (`privacy`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf32 COLLATE=utf32_turkish_ci;
 
 -- --------------------------------------------------------
@@ -428,7 +476,8 @@ CREATE TABLE IF NOT EXISTS `friend_list` (
 
 CREATE TABLE IF NOT EXISTS `gender` (
   `gender_id` int(11) NOT NULL,
-  `gender` varchar(50) COLLATE utf32_turkish_ci NOT NULL
+  `gender` varchar(50) COLLATE utf32_turkish_ci NOT NULL,
+  PRIMARY KEY (`gender_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf32 COLLATE=utf32_turkish_ci;
 
 --
@@ -457,7 +506,9 @@ CREATE TABLE IF NOT EXISTS `groups` (
   `name` varchar(80) COLLATE utf32_turkish_ci NOT NULL,
   `description` text COLLATE utf32_turkish_ci NOT NULL,
   `created_on` date NOT NULL,
-  `destroyed_on` date DEFAULT NULL
+  `destroyed_on` date DEFAULT NULL,
+  PRIMARY KEY (`group_id`),
+  KEY `created_by` (`created_by`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf32 COLLATE=utf32_turkish_ci;
 
 --
@@ -477,7 +528,9 @@ CREATE TABLE IF NOT EXISTS `group_membership` (
   `user_id` int(11) NOT NULL,
   `group_id` int(11) NOT NULL,
   `membership_start` date NOT NULL,
-  `membership_end` date DEFAULT NULL
+  `membership_end` date DEFAULT NULL,
+  PRIMARY KEY (`user_id`,`group_id`),
+  KEY `group_id` (`group_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf32 COLLATE=utf32_turkish_ci;
 
 --
@@ -497,7 +550,8 @@ INSERT INTO `group_membership` (`user_id`, `group_id`, `membership_start`, `memb
 CREATE TABLE IF NOT EXISTS `interests` (
   `id` int(11) NOT NULL,
   `interest` varchar(255) COLLATE utf32_turkish_ci NOT NULL,
-  `profile_id` int(11) NOT NULL
+  `profile_id` int(11) NOT NULL,
+  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf32 COLLATE=utf32_turkish_ci;
 
 -- --------------------------------------------------------
@@ -508,7 +562,8 @@ CREATE TABLE IF NOT EXISTS `interests` (
 
 CREATE TABLE IF NOT EXISTS `job_type` (
   `job_type_page` int(11) NOT NULL,
-  `job_description` text COLLATE utf32_turkish_ci NOT NULL
+  `job_description` text COLLATE utf32_turkish_ci NOT NULL,
+  PRIMARY KEY (`job_type_page`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf32 COLLATE=utf32_turkish_ci;
 
 -- --------------------------------------------------------
@@ -519,7 +574,8 @@ CREATE TABLE IF NOT EXISTS `job_type` (
 
 CREATE TABLE IF NOT EXISTS `lang` (
   `id` int(11) NOT NULL,
-  `language` varchar(50) COLLATE utf32_turkish_ci NOT NULL
+  `language` varchar(50) COLLATE utf32_turkish_ci NOT NULL,
+  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf32 COLLATE=utf32_turkish_ci;
 
 --
@@ -540,7 +596,10 @@ CREATE TABLE IF NOT EXISTS `like_dislike` (
   `id` int(11) NOT NULL,
   `whois_id` int(11) NOT NULL,
   `post_id` int(11) NOT NULL,
-  `likescore` tinyint(4) NOT NULL
+  `likescore` tinyint(4) NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `whois_id` (`whois_id`,`post_id`),
+  UNIQUE KEY `whois_id_2` (`whois_id`,`post_id`,`likescore`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf32 COLLATE=utf32_turkish_ci;
 
 -- --------------------------------------------------------
@@ -550,9 +609,10 @@ CREATE TABLE IF NOT EXISTS `like_dislike` (
 --
 
 CREATE TABLE IF NOT EXISTS `marital_status` (
-`marital_status_id` smallint(6) NOT NULL,
-  `marital_status_name` text COLLATE utf32_turkish_ci NOT NULL
-) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=utf32 COLLATE=utf32_turkish_ci;
+  `marital_status_id` smallint(6) NOT NULL AUTO_INCREMENT,
+  `marital_status_name` text COLLATE utf32_turkish_ci NOT NULL,
+  PRIMARY KEY (`marital_status_id`)
+) ENGINE=InnoDB  DEFAULT CHARSET=utf32 COLLATE=utf32_turkish_ci AUTO_INCREMENT=10 ;
 
 --
 -- Tablo döküm verisi `marital_status`
@@ -580,29 +640,11 @@ CREATE TABLE IF NOT EXISTS `messages` (
   `id` int(11) NOT NULL,
   `message` mediumtext COLLATE utf32_turkish_ci NOT NULL,
   `created_at` date NOT NULL,
-  `is_read` bit(1) NOT NULL,
+  `is_read` int(11) NOT NULL,
   `is_spam` int(11) NOT NULL,
-  `chat_id` int(11) NOT NULL
+  `chat_id` int(11) NOT NULL,
+  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf32 COLLATE=utf32_turkish_ci;
-
--- --------------------------------------------------------
-
---
--- Tablo için tablo yapısı `muted_notifications`
---
-
-CREATE TABLE IF NOT EXISTS `muted_notifications` (
-  `nfrom` int(11) NOT NULL,
-  `nto` int(11) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf32 COLLATE=utf32_turkish_ci;
-
---
--- Tablo döküm verisi `muted_notifications`
---
-
-INSERT INTO `muted_notifications` (`nfrom`, `nto`) VALUES
-(57, 1),
-(58, 1);
 
 -- --------------------------------------------------------
 
@@ -619,7 +661,11 @@ CREATE TABLE IF NOT EXISTS `notification` (
   `status` varchar(50) COLLATE utf32_turkish_ci NOT NULL,
   `user_id` int(11) NOT NULL,
   `who` int(11) NOT NULL,
-  `is_read` bit(1) NOT NULL DEFAULT b'0'
+  `is_read` bit(1) NOT NULL DEFAULT b'0',
+  PRIMARY KEY (`id`),
+  KEY `msg` (`msg`(191),`created_at`),
+  KEY `notified_to` (`user_id`),
+  KEY `notification_target` (`privacy`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf32 COLLATE=utf32_turkish_ci;
 
 -- --------------------------------------------------------
@@ -633,7 +679,8 @@ CREATE TABLE IF NOT EXISTS `page_generic` (
   `date_created` date NOT NULL,
   `summary` varchar(255) COLLATE utf32_turkish_ci NOT NULL,
   `description` text COLLATE utf32_turkish_ci,
-  `privacy` int(11) NOT NULL DEFAULT '0'
+  `privacy` int(11) NOT NULL DEFAULT '0',
+  PRIMARY KEY (`pagenumber`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf32 COLLATE=utf32_turkish_ci;
 
 --
@@ -654,7 +701,9 @@ INSERT INTO `page_generic` (`pagenumber`, `date_created`, `summary`, `descriptio
 
 CREATE TABLE IF NOT EXISTS `page_ownership` (
   `pagenumber` int(11) NOT NULL,
-  `created_by` int(11) DEFAULT NULL
+  `created_by` int(11) DEFAULT NULL,
+  PRIMARY KEY (`pagenumber`),
+  KEY `page_created_by` (`created_by`) COMMENT 'user'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf32 COLLATE=utf32_turkish_ci;
 
 -- --------------------------------------------------------
@@ -665,7 +714,8 @@ CREATE TABLE IF NOT EXISTS `page_ownership` (
 
 CREATE TABLE IF NOT EXISTS `phones` (
   `profile_id` int(11) NOT NULL,
-  `phone_number` decimal(28,0) NOT NULL DEFAULT '0'
+  `phone_number` decimal(28,0) NOT NULL DEFAULT '0',
+  PRIMARY KEY (`profile_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf32 COLLATE=utf32_turkish_ci;
 
 -- --------------------------------------------------------
@@ -676,7 +726,8 @@ CREATE TABLE IF NOT EXISTS `phones` (
 
 CREATE TABLE IF NOT EXISTS `phone_types` (
   `phone_number` decimal(28,0) NOT NULL DEFAULT '0',
-  `phone_type` enum('fixed','cellular','voip','') COLLATE utf32_turkish_ci NOT NULL DEFAULT 'voip'
+  `phone_type` enum('fixed','cellular','voip','') COLLATE utf32_turkish_ci NOT NULL DEFAULT 'voip',
+  PRIMARY KEY (`phone_number`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf32 COLLATE=utf32_turkish_ci;
 
 -- --------------------------------------------------------
@@ -689,7 +740,9 @@ CREATE TABLE IF NOT EXISTS `picture` (
   `id` int(11) NOT NULL,
   `p_address` varchar(150) COLLATE utf32_turkish_ci NOT NULL,
   `privacy` int(11) NOT NULL COMMENT 'user or group or page or friend list',
-  `created_at` date NOT NULL
+  `created_at` date NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `post_privacy` (`privacy`) COMMENT 'To whom the post is visible'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf32 COLLATE=utf32_turkish_ci;
 
 -- --------------------------------------------------------
@@ -699,9 +752,37 @@ CREATE TABLE IF NOT EXISTS `picture` (
 --
 
 CREATE TABLE IF NOT EXISTS `post` (
-  `post_id` int(11) NOT NULL,
-  `actor_id` int(11) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf32 COLLATE=utf32_turkish_ci;
+  `post_id` int(11) NOT NULL AUTO_INCREMENT,
+  `actor_id` int(11) NOT NULL,
+  PRIMARY KEY (`post_id`),
+  UNIQUE KEY `posted_by` (`actor_id`),
+  KEY `post_id` (`post_id`),
+  KEY `actor_id` (`actor_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf32 COLLATE=utf32_turkish_ci AUTO_INCREMENT=1 ;
+
+--
+-- Tetikleyiciler `post`
+--
+DROP TRIGGER IF EXISTS `post_timeline`;
+DELIMITER //
+CREATE TRIGGER `post_timeline` AFTER INSERT ON `post`
+ FOR EACH ROW BEGIN
+
+   	DECLARE actor int;
+	DECLARE post int;
+	DECLARE shown date;
+
+   SELECT new.actor_id INTO actor;
+
+   SELECT new.post_id INTO post;
+	
+
+
+   insert into timeline values (actor,post,shown);
+   
+END
+//
+DELIMITER ;
 
 -- --------------------------------------------------------
 
@@ -712,7 +793,9 @@ CREATE TABLE IF NOT EXISTS `post` (
 CREATE TABLE IF NOT EXISTS `reply` (
   `id` int(11) NOT NULL,
   `reply` varchar(255) COLLATE utf32_turkish_ci NOT NULL,
-  `status_id` int(11) NOT NULL
+  `status_id` int(11) NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `is_reply_of` (`status_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf32 COLLATE=utf32_turkish_ci;
 
 -- --------------------------------------------------------
@@ -730,7 +813,9 @@ CREATE TABLE IF NOT EXISTS `status` (
   `privacy` int(11) NOT NULL,
   `to_fb` varchar(80) COLLATE utf32_turkish_ci NOT NULL,
   `to_twitter` varchar(80) COLLATE utf32_turkish_ci NOT NULL,
-  `attachment` varchar(80) COLLATE utf32_turkish_ci DEFAULT NULL
+  `attachment` varchar(80) COLLATE utf32_turkish_ci DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `status_target` (`privacy`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf32 COLLATE=utf32_turkish_ci;
 
 -- --------------------------------------------------------
@@ -744,7 +829,11 @@ CREATE TABLE IF NOT EXISTS `tags` (
   `tag_id` int(11) NOT NULL,
   `who_id` int(11) NOT NULL,
   `status` int(11) NOT NULL,
-  `post_id` int(11) NOT NULL
+  `post_id` int(11) NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `tagged_by` (`who_id`),
+  KEY `tagged` (`tag_id`),
+  KEY `tagged_in` (`post_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf32 COLLATE=utf32_turkish_ci;
 
 -- --------------------------------------------------------
@@ -756,7 +845,9 @@ CREATE TABLE IF NOT EXISTS `tags` (
 CREATE TABLE IF NOT EXISTS `timeline` (
   `actor_id` int(11) NOT NULL,
   `post_id` int(11) NOT NULL,
-  `shown_at` date NOT NULL
+  `shown_at` date NOT NULL,
+  PRIMARY KEY (`actor_id`,`post_id`),
+  KEY `post_subject` (`post_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf32 COLLATE=utf32_turkish_ci;
 
 -- --------------------------------------------------------
@@ -779,7 +870,14 @@ CREATE TABLE IF NOT EXISTS `user_info` (
   `religion` int(11) DEFAULT NULL,
   `rating` int(11) NOT NULL,
   `mail` int(11) NOT NULL,
-  `lang` int(11) NOT NULL DEFAULT '1'
+  `lang` int(11) NOT NULL DEFAULT '1',
+  PRIMARY KEY (`user_id`),
+  KEY `mail` (`mail`) COMMENT 'user_email',
+  KEY `user_gender` (`gender`),
+  KEY `user_marital` (`marital_status_code`),
+  KEY `user_address` (`address`),
+  KEY `religion` (`religion`),
+  KEY `user_locale` (`lang`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf32 COLLATE=utf32_turkish_ci;
 
 --
@@ -787,6 +885,7 @@ CREATE TABLE IF NOT EXISTS `user_info` (
 --
 
 INSERT INTO `user_info` (`user_id`, `date_joined`, `date_of_birth`, `givenname`, `middlename`, `familyname`, `gender`, `marital_status_code`, `quit`, `address`, `religion`, `rating`, `mail`, `lang`) VALUES
+(0, '2014-12-31', '2014-12-30', 'A', 'B', 'C', 1, 5, 1, 1, NULL, 3, 1, 1),
 (1, '2004-05-02', '1984-05-11', 'Mark', NULL, 'Zuckerberg', 2, 1, 0, 0, 64, 0, 0, 0),
 (57, '2012-12-21', '1994-12-27', 'Erkin', 'Alp', 'Güney', 2, 0, 0, 1, NULL, 0, 1, 1),
 (63, '2012-12-21', '1991-08-25', 'Alper', NULL, 'Biçer', 2, 0, 0, 1, 59, 0, 2, 1);
@@ -794,6 +893,21 @@ INSERT INTO `user_info` (`user_id`, `date_joined`, `date_of_birth`, `givenname`,
 --
 -- Tetikleyiciler `user_info`
 --
+DROP TRIGGER IF EXISTS `update_info`;
+DELIMITER //
+CREATE TRIGGER `update_info` AFTER UPDATE ON `user_info`
+ FOR EACH ROW BEGIN
+
+   DECLARE actor int;
+
+   SELECT new.user_id INTO actor;
+
+   insert into post(actor_id) values (actor);
+   
+END
+//
+DELIMITER ;
+DROP TRIGGER IF EXISTS `user_create`;
 DELIMITER //
 CREATE TRIGGER `user_create` BEFORE INSERT ON `user_info`
  FOR EACH ROW BEGIN
@@ -819,7 +933,10 @@ CREATE TABLE IF NOT EXISTS `volunteers` (
   `volunteer` int(11) NOT NULL,
   `voluntree` int(11) NOT NULL COMMENT 'group volunteered in behalf of',
   `date_started` date NOT NULL,
-  `date_dropped` date NOT NULL
+  `date_dropped` date NOT NULL,
+  PRIMARY KEY (`volunteering_id`),
+  KEY `volunteer` (`volunteer`),
+  KEY `voluntree` (`voluntree`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf32 COLLATE=utf32_turkish_ci;
 
 -- --------------------------------------------------------
@@ -834,314 +951,12 @@ CREATE TABLE IF NOT EXISTS `want_ad` (
   `job_type` int(11) NOT NULL,
   `description` text COLLATE utf32_turkish_ci NOT NULL,
   `created_on` date NOT NULL,
-  `dropped_on` date DEFAULT NULL
+  `dropped_on` date DEFAULT NULL,
+  PRIMARY KEY (`employer_id`,`ad_responsibility`,`job_type`),
+  KEY `ad_responsibility_user` (`ad_responsibility`),
+  KEY `ad_job_type` (`job_type`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf32 COLLATE=utf32_turkish_ci;
 
---
--- Dökümü yapılmış tablolar için indeksler
---
-
---
--- Tablo için indeksler `actors`
---
-ALTER TABLE `actors`
- ADD PRIMARY KEY (`actor_id`);
-
---
--- Tablo için indeksler `address`
---
-ALTER TABLE `address`
- ADD PRIMARY KEY (`address_id`);
-
---
--- Tablo için indeksler `block`
---
-ALTER TABLE `block`
- ADD PRIMARY KEY (`blocker`,`blockee`), ADD KEY `blockee` (`blockee`);
-
---
--- Tablo için indeksler `category`
---
-ALTER TABLE `category`
- ADD PRIMARY KEY (`id`);
-
---
--- Tablo için indeksler `chat`
---
-ALTER TABLE `chat`
- ADD PRIMARY KEY (`id`), ADD KEY `chat_created_by` (`created_by`);
-
---
--- Tablo için indeksler `city`
---
-ALTER TABLE `city`
- ADD PRIMARY KEY (`id`);
-
---
--- Tablo için indeksler `comments`
---
-ALTER TABLE `comments`
- ADD PRIMARY KEY (`id`), ADD UNIQUE KEY `comment_post` (`post_id`), ADD KEY `comment_created_by` (`created_by`) COMMENT 'User, group or page can comment';
-
---
--- Tablo için indeksler `connections`
---
-ALTER TABLE `connections`
- ADD PRIMARY KEY (`connection_id`), ADD UNIQUE KEY `member_one` (`member_one`,`member_two`);
-
---
--- Tablo için indeksler `country`
---
-ALTER TABLE `country`
- ADD PRIMARY KEY (`id`);
-
---
--- Tablo için indeksler `curriculumvitae`
---
-ALTER TABLE `curriculumvitae`
- ADD PRIMARY KEY (`cv_id`), ADD UNIQUE KEY `cv_ownership` (`vitae`);
-
---
--- Tablo için indeksler `curriculumvitae_attachment`
---
-ALTER TABLE `curriculumvitae_attachment`
- ADD PRIMARY KEY (`attachment_id`), ADD KEY `cv_attachment_ref` (`cv_id`);
-
---
--- Tablo için indeksler `curriculumvitae_employment_entry`
---
-ALTER TABLE `curriculumvitae_employment_entry`
- ADD PRIMARY KEY (`cv_attachment_id`), ADD UNIQUE KEY `curriculumvitae_employment` (`employment_id`);
-
---
--- Tablo için indeksler `curriculumvitae_volunteering_entry`
---
-ALTER TABLE `curriculumvitae_volunteering_entry`
- ADD PRIMARY KEY (`curriculumvitae`), ADD UNIQUE KEY `curriculumvitae_volunteering` (`volunteering_id`);
-
---
--- Tablo için indeksler `education`
---
-ALTER TABLE `education`
- ADD PRIMARY KEY (`id`);
-
---
--- Tablo için indeksler `emails`
---
-ALTER TABLE `emails`
- ADD PRIMARY KEY (`email_id`);
-
---
--- Tablo için indeksler `employer`
---
-ALTER TABLE `employer`
- ADD PRIMARY KEY (`employer_id`), ADD UNIQUE KEY `employer_user_2` (`employer_user`,`employer_page`), ADD KEY `employer_user` (`employer_user`), ADD KEY `employer_company` (`employer_page`);
-
---
--- Tablo için indeksler `employment`
---
-ALTER TABLE `employment`
- ADD PRIMARY KEY (`employment_id`), ADD KEY `employer_ref` (`employer`), ADD KEY `employee` (`employee`), ADD KEY `employer` (`employer`,`employee`), ADD KEY `curriculumvitae_referenced` (`curriculumvitae`), ADD KEY `employee_works_on` (`job_type`);
-
---
--- Tablo için indeksler `fav_animals`
---
-ALTER TABLE `fav_animals`
- ADD PRIMARY KEY (`id`), ADD UNIQUE KEY `animal` (`animal`,`profile_id`);
-
---
--- Tablo için indeksler `fav_artists`
---
-ALTER TABLE `fav_artists`
- ADD PRIMARY KEY (`id`), ADD UNIQUE KEY `artist` (`artist`,`profile_id`);
-
---
--- Tablo için indeksler `fav_movie`
---
-ALTER TABLE `fav_movie`
- ADD PRIMARY KEY (`id`), ADD UNIQUE KEY `movie` (`movie`,`profile_id`);
-
---
--- Tablo için indeksler `follows`
---
-ALTER TABLE `follows`
- ADD PRIMARY KEY (`one`,`two`), ADD KEY `followee_actor` (`two`);
-
---
--- Tablo için indeksler `friend`
---
-ALTER TABLE `friend`
- ADD PRIMARY KEY (`id`), ADD UNIQUE KEY `friend_user_id` (`friend_user_id`,`user_id`);
-
---
--- Tablo için indeksler `friend_list`
---
-ALTER TABLE `friend_list`
- ADD PRIMARY KEY (`id`), ADD KEY `friendlist_target` (`privacy`);
-
---
--- Tablo için indeksler `gender`
---
-ALTER TABLE `gender`
- ADD PRIMARY KEY (`gender_id`);
-
---
--- Tablo için indeksler `groups`
---
-ALTER TABLE `groups`
- ADD PRIMARY KEY (`group_id`), ADD KEY `created_by` (`created_by`);
-
---
--- Tablo için indeksler `group_membership`
---
-ALTER TABLE `group_membership`
- ADD PRIMARY KEY (`user_id`,`group_id`), ADD KEY `group_id` (`group_id`);
-
---
--- Tablo için indeksler `interests`
---
-ALTER TABLE `interests`
- ADD PRIMARY KEY (`id`);
-
---
--- Tablo için indeksler `job_type`
---
-ALTER TABLE `job_type`
- ADD PRIMARY KEY (`job_type_page`);
-
---
--- Tablo için indeksler `lang`
---
-ALTER TABLE `lang`
- ADD PRIMARY KEY (`id`);
-
---
--- Tablo için indeksler `like_dislike`
---
-ALTER TABLE `like_dislike`
- ADD PRIMARY KEY (`id`), ADD UNIQUE KEY `whois_id` (`whois_id`,`post_id`), ADD UNIQUE KEY `whois_id_2` (`whois_id`,`post_id`,`likescore`);
-
---
--- Tablo için indeksler `marital_status`
---
-ALTER TABLE `marital_status`
- ADD PRIMARY KEY (`marital_status_id`);
-
---
--- Tablo için indeksler `messages`
---
-ALTER TABLE `messages`
- ADD PRIMARY KEY (`id`);
-
---
--- Tablo için indeksler `muted_notifications`
---
-ALTER TABLE `muted_notifications`
- ADD PRIMARY KEY (`nfrom`,`nto`), ADD KEY `muted_to` (`nto`);
-
---
--- Tablo için indeksler `notification`
---
-ALTER TABLE `notification`
- ADD PRIMARY KEY (`id`), ADD KEY `msg` (`msg`(191),`created_at`), ADD KEY `notified_to` (`user_id`), ADD KEY `notification_target` (`privacy`);
-
---
--- Tablo için indeksler `page_generic`
---
-ALTER TABLE `page_generic`
- ADD PRIMARY KEY (`pagenumber`);
-
---
--- Tablo için indeksler `page_ownership`
---
-ALTER TABLE `page_ownership`
- ADD PRIMARY KEY (`pagenumber`), ADD KEY `page_created_by` (`created_by`) COMMENT 'user';
-
---
--- Tablo için indeksler `phones`
---
-ALTER TABLE `phones`
- ADD PRIMARY KEY (`profile_id`);
-
---
--- Tablo için indeksler `phone_types`
---
-ALTER TABLE `phone_types`
- ADD PRIMARY KEY (`phone_number`);
-
---
--- Tablo için indeksler `picture`
---
-ALTER TABLE `picture`
- ADD PRIMARY KEY (`id`), ADD KEY `post_privacy` (`privacy`) COMMENT 'To whom the post is visible';
-
---
--- Tablo için indeksler `post`
---
-ALTER TABLE `post`
- ADD PRIMARY KEY (`post_id`), ADD UNIQUE KEY `posted_by` (`actor_id`);
-
---
--- Tablo için indeksler `reply`
---
-ALTER TABLE `reply`
- ADD PRIMARY KEY (`id`), ADD KEY `is_reply_of` (`status_id`);
-
---
--- Tablo için indeksler `status`
---
-ALTER TABLE `status`
- ADD PRIMARY KEY (`id`), ADD KEY `status_target` (`privacy`);
-
---
--- Tablo için indeksler `tags`
---
-ALTER TABLE `tags`
- ADD PRIMARY KEY (`id`), ADD KEY `tagged_by` (`who_id`), ADD KEY `tagged` (`tag_id`), ADD KEY `tagged_in` (`post_id`);
-
---
--- Tablo için indeksler `timeline`
---
-ALTER TABLE `timeline`
- ADD PRIMARY KEY (`actor_id`,`post_id`), ADD KEY `post_subject` (`post_id`);
-
---
--- Tablo için indeksler `user_info`
---
-ALTER TABLE `user_info`
- ADD PRIMARY KEY (`user_id`), ADD KEY `mail` (`mail`) COMMENT 'user_email', ADD KEY `user_gender` (`gender`), ADD KEY `user_marital` (`marital_status_code`), ADD KEY `user_address` (`address`), ADD KEY `religion` (`religion`), ADD KEY `user_locale` (`lang`);
-
---
--- Tablo için indeksler `volunteers`
---
-ALTER TABLE `volunteers`
- ADD PRIMARY KEY (`volunteering_id`), ADD KEY `volunteer` (`volunteer`), ADD KEY `voluntree` (`voluntree`);
-
---
--- Tablo için indeksler `want_ad`
---
-ALTER TABLE `want_ad`
- ADD PRIMARY KEY (`employer_id`,`ad_responsibility`,`job_type`), ADD KEY `ad_responsibility_user` (`ad_responsibility`), ADD KEY `ad_job_type` (`job_type`);
-
---
--- Dökümü yapılmış tablolar için AUTO_INCREMENT değeri
---
-
---
--- Tablo için AUTO_INCREMENT değeri `actors`
---
-ALTER TABLE `actors`
-MODIFY `actor_id` int(11) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=65;
---
--- Tablo için AUTO_INCREMENT değeri `employer`
---
-ALTER TABLE `employer`
-MODIFY `employer_id` int(11) NOT NULL AUTO_INCREMENT;
---
--- Tablo için AUTO_INCREMENT değeri `marital_status`
---
-ALTER TABLE `marital_status`
-MODIFY `marital_status_id` smallint(6) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=10;
 --
 -- Dökümü yapılmış tablolar için kısıtlamalar
 --
@@ -1150,179 +965,172 @@ MODIFY `marital_status_id` smallint(6) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=10
 -- Tablo kısıtlamaları `block`
 --
 ALTER TABLE `block`
-ADD CONSTRAINT `blockee` FOREIGN KEY (`blockee`) REFERENCES `user_info` (`user_id`),
-ADD CONSTRAINT `blocker` FOREIGN KEY (`blocker`) REFERENCES `user_info` (`user_id`);
+  ADD CONSTRAINT `blockee` FOREIGN KEY (`blockee`) REFERENCES `user_info` (`user_id`),
+  ADD CONSTRAINT `blocker` FOREIGN KEY (`blocker`) REFERENCES `user_info` (`user_id`);
 
 --
 -- Tablo kısıtlamaları `comments`
 --
 ALTER TABLE `comments`
-ADD CONSTRAINT `comment_activity` FOREIGN KEY (`id`) REFERENCES `actors` (`actor_id`),
-ADD CONSTRAINT `comment_refers_to` FOREIGN KEY (`post_id`) REFERENCES `post` (`post_id`);
+  ADD CONSTRAINT `comment_activity` FOREIGN KEY (`id`) REFERENCES `actors` (`actor_id`),
+  ADD CONSTRAINT `comment_refers_to` FOREIGN KEY (`post_id`) REFERENCES `post` (`post_id`);
 
 --
 -- Tablo kısıtlamaları `curriculumvitae`
 --
 ALTER TABLE `curriculumvitae`
-ADD CONSTRAINT `curriculumvitae_ownership` FOREIGN KEY (`vitae`) REFERENCES `user_info` (`user_id`);
+  ADD CONSTRAINT `curriculumvitae_ownership` FOREIGN KEY (`vitae`) REFERENCES `user_info` (`user_id`);
 
 --
 -- Tablo kısıtlamaları `curriculumvitae_attachment`
 --
 ALTER TABLE `curriculumvitae_attachment`
-ADD CONSTRAINT `curriculumvitae_attached_to` FOREIGN KEY (`cv_id`) REFERENCES `curriculumvitae` (`cv_id`) ON DELETE CASCADE ON UPDATE CASCADE;
+  ADD CONSTRAINT `curriculumvitae_attached_to` FOREIGN KEY (`cv_id`) REFERENCES `curriculumvitae` (`cv_id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
 -- Tablo kısıtlamaları `curriculumvitae_employment_entry`
 --
 ALTER TABLE `curriculumvitae_employment_entry`
-ADD CONSTRAINT `curriculumvitae_employment_id` FOREIGN KEY (`employment_id`) REFERENCES `employment` (`employment_id`),
-ADD CONSTRAINT `employment_curriculumvitae_ref` FOREIGN KEY (`cv_attachment_id`) REFERENCES `curriculumvitae_attachment` (`attachment_id`);
+  ADD CONSTRAINT `curriculumvitae_employment_id` FOREIGN KEY (`employment_id`) REFERENCES `employment` (`employment_id`),
+  ADD CONSTRAINT `employment_curriculumvitae_ref` FOREIGN KEY (`cv_attachment_id`) REFERENCES `curriculumvitae_attachment` (`attachment_id`);
 
 --
 -- Tablo kısıtlamaları `curriculumvitae_volunteering_entry`
 --
 ALTER TABLE `curriculumvitae_volunteering_entry`
-ADD CONSTRAINT `curriculumvitae_volunteering` FOREIGN KEY (`volunteering_id`) REFERENCES `volunteers` (`volunteering_id`),
-ADD CONSTRAINT `volunteers_curriculumvitae` FOREIGN KEY (`curriculumvitae`) REFERENCES `curriculumvitae` (`cv_id`);
+  ADD CONSTRAINT `curriculumvitae_volunteering` FOREIGN KEY (`volunteering_id`) REFERENCES `volunteers` (`volunteering_id`),
+  ADD CONSTRAINT `volunteers_curriculumvitae` FOREIGN KEY (`curriculumvitae`) REFERENCES `curriculumvitae` (`cv_id`);
 
 --
 -- Tablo kısıtlamaları `employer`
 --
 ALTER TABLE `employer`
-ADD CONSTRAINT `employer_company` FOREIGN KEY (`employer_page`) REFERENCES `page_generic` (`pagenumber`),
-ADD CONSTRAINT `employer_user` FOREIGN KEY (`employer_user`) REFERENCES `user_info` (`user_id`) ON UPDATE CASCADE;
+  ADD CONSTRAINT `employer_company` FOREIGN KEY (`employer_page`) REFERENCES `page_generic` (`pagenumber`),
+  ADD CONSTRAINT `employer_user` FOREIGN KEY (`employer_user`) REFERENCES `user_info` (`user_id`) ON UPDATE CASCADE;
 
 --
 -- Tablo kısıtlamaları `employment`
 --
 ALTER TABLE `employment`
-ADD CONSTRAINT `curriculumvitae_ref` FOREIGN KEY (`curriculumvitae`) REFERENCES `curriculumvitae` (`cv_id`),
-ADD CONSTRAINT `employee_job_type` FOREIGN KEY (`job_type`) REFERENCES `job_type` (`job_type_page`) ON DELETE SET NULL ON UPDATE CASCADE,
-ADD CONSTRAINT `employee_ref` FOREIGN KEY (`employee`) REFERENCES `user_info` (`user_id`),
-ADD CONSTRAINT `employment_employer` FOREIGN KEY (`employer`) REFERENCES `employer` (`employer_id`);
+  ADD CONSTRAINT `curriculumvitae_ref` FOREIGN KEY (`curriculumvitae`) REFERENCES `curriculumvitae` (`cv_id`),
+  ADD CONSTRAINT `employee_job_type` FOREIGN KEY (`job_type`) REFERENCES `job_type` (`job_type_page`) ON DELETE SET NULL ON UPDATE CASCADE,
+  ADD CONSTRAINT `employee_ref` FOREIGN KEY (`employee`) REFERENCES `user_info` (`user_id`),
+  ADD CONSTRAINT `employment_employer` FOREIGN KEY (`employer`) REFERENCES `employer` (`employer_id`);
 
 --
 -- Tablo kısıtlamaları `follows`
 --
 ALTER TABLE `follows`
-ADD CONSTRAINT `followee_actor` FOREIGN KEY (`two`) REFERENCES `actors` (`actor_id`),
-ADD CONSTRAINT `follower_user` FOREIGN KEY (`one`) REFERENCES `user_info` (`user_id`);
+  ADD CONSTRAINT `followee_actor` FOREIGN KEY (`two`) REFERENCES `actors` (`actor_id`),
+  ADD CONSTRAINT `follower_user` FOREIGN KEY (`one`) REFERENCES `user_info` (`user_id`);
 
 --
 -- Tablo kısıtlamaları `friend_list`
 --
 ALTER TABLE `friend_list`
-ADD CONSTRAINT `friend_list_as_an_actor` FOREIGN KEY (`id`) REFERENCES `actors` (`actor_id`),
-ADD CONSTRAINT `friend_list_visibility` FOREIGN KEY (`privacy`) REFERENCES `actors` (`actor_id`);
+  ADD CONSTRAINT `friend_list_as_an_actor` FOREIGN KEY (`id`) REFERENCES `actors` (`actor_id`),
+  ADD CONSTRAINT `friend_list_visibility` FOREIGN KEY (`privacy`) REFERENCES `actors` (`actor_id`);
 
 --
 -- Tablo kısıtlamaları `groups`
 --
 ALTER TABLE `groups`
-ADD CONSTRAINT `group_actor` FOREIGN KEY (`group_id`) REFERENCES `actors` (`actor_id`),
-ADD CONSTRAINT `group_creator` FOREIGN KEY (`created_by`) REFERENCES `user_info` (`user_id`);
+  ADD CONSTRAINT `group_actor` FOREIGN KEY (`group_id`) REFERENCES `actors` (`actor_id`),
+  ADD CONSTRAINT `group_creator` FOREIGN KEY (`created_by`) REFERENCES `user_info` (`user_id`);
 
 --
 -- Tablo kısıtlamaları `group_membership`
 --
 ALTER TABLE `group_membership`
-ADD CONSTRAINT `group_member` FOREIGN KEY (`user_id`) REFERENCES `user_info` (`user_id`),
-ADD CONSTRAINT `group_ref` FOREIGN KEY (`group_id`) REFERENCES `groups` (`group_id`);
+  ADD CONSTRAINT `group_member` FOREIGN KEY (`user_id`) REFERENCES `user_info` (`user_id`),
+  ADD CONSTRAINT `group_ref` FOREIGN KEY (`group_id`) REFERENCES `groups` (`group_id`);
 
 --
 -- Tablo kısıtlamaları `like_dislike`
 --
 ALTER TABLE `like_dislike`
-ADD CONSTRAINT `liked_by` FOREIGN KEY (`whois_id`) REFERENCES `actors` (`actor_id`);
-
---
--- Tablo kısıtlamaları `muted_notifications`
---
-ALTER TABLE `muted_notifications`
-ADD CONSTRAINT `muted_to` FOREIGN KEY (`nto`) REFERENCES `user_info` (`user_id`) ON DELETE CASCADE ON UPDATE CASCADE,
-ADD CONSTRAINT `muted_from` FOREIGN KEY (`nfrom`) REFERENCES `actors` (`actor_id`) ON DELETE CASCADE ON UPDATE CASCADE;
+  ADD CONSTRAINT `liked_by` FOREIGN KEY (`whois_id`) REFERENCES `actors` (`actor_id`);
 
 --
 -- Tablo kısıtlamaları `page_generic`
 --
 ALTER TABLE `page_generic`
-ADD CONSTRAINT `page_actor` FOREIGN KEY (`pagenumber`) REFERENCES `actors` (`actor_id`);
+  ADD CONSTRAINT `page_actor` FOREIGN KEY (`pagenumber`) REFERENCES `actors` (`actor_id`);
 
 --
 -- Tablo kısıtlamaları `page_ownership`
 --
 ALTER TABLE `page_ownership`
-ADD CONSTRAINT `owned_page_existing` FOREIGN KEY (`pagenumber`) REFERENCES `page_generic` (`pagenumber`),
-ADD CONSTRAINT `page_created_by` FOREIGN KEY (`created_by`) REFERENCES `user_info` (`user_id`);
+  ADD CONSTRAINT `owned_page_existing` FOREIGN KEY (`pagenumber`) REFERENCES `page_generic` (`pagenumber`),
+  ADD CONSTRAINT `page_created_by` FOREIGN KEY (`created_by`) REFERENCES `user_info` (`user_id`);
 
 --
 -- Tablo kısıtlamaları `picture`
 --
 ALTER TABLE `picture`
-ADD CONSTRAINT `picture_activity` FOREIGN KEY (`id`) REFERENCES `post` (`post_id`),
-ADD CONSTRAINT `privacy_target` FOREIGN KEY (`privacy`) REFERENCES `actors` (`actor_id`);
+  ADD CONSTRAINT `picture_activity` FOREIGN KEY (`id`) REFERENCES `post` (`post_id`),
+  ADD CONSTRAINT `privacy_target` FOREIGN KEY (`privacy`) REFERENCES `actors` (`actor_id`);
 
 --
 -- Tablo kısıtlamaları `post`
 --
 ALTER TABLE `post`
-ADD CONSTRAINT `posted_by` FOREIGN KEY (`actor_id`) REFERENCES `actors` (`actor_id`) ON DELETE CASCADE ON UPDATE CASCADE;
+  ADD CONSTRAINT `posted_by` FOREIGN KEY (`actor_id`) REFERENCES `actors` (`actor_id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
 -- Tablo kısıtlamaları `reply`
 --
 ALTER TABLE `reply`
-ADD CONSTRAINT `is_reply_of` FOREIGN KEY (`status_id`) REFERENCES `post` (`post_id`);
+  ADD CONSTRAINT `is_reply_of` FOREIGN KEY (`status_id`) REFERENCES `post` (`post_id`);
 
 --
 -- Tablo kısıtlamaları `status`
 --
 ALTER TABLE `status`
-ADD CONSTRAINT `status_activity` FOREIGN KEY (`id`) REFERENCES `post` (`post_id`),
-ADD CONSTRAINT `status_target` FOREIGN KEY (`privacy`) REFERENCES `actors` (`actor_id`);
+  ADD CONSTRAINT `status_activity` FOREIGN KEY (`id`) REFERENCES `post` (`post_id`),
+  ADD CONSTRAINT `status_target` FOREIGN KEY (`privacy`) REFERENCES `actors` (`actor_id`);
 
 --
 -- Tablo kısıtlamaları `tags`
 --
 ALTER TABLE `tags`
-ADD CONSTRAINT `tagged` FOREIGN KEY (`tag_id`) REFERENCES `user_info` (`user_id`),
-ADD CONSTRAINT `tagged_by` FOREIGN KEY (`who_id`) REFERENCES `actors` (`actor_id`),
-ADD CONSTRAINT `tagged_in` FOREIGN KEY (`post_id`) REFERENCES `picture` (`id`);
+  ADD CONSTRAINT `tagged` FOREIGN KEY (`tag_id`) REFERENCES `user_info` (`user_id`),
+  ADD CONSTRAINT `tagged_by` FOREIGN KEY (`who_id`) REFERENCES `actors` (`actor_id`),
+  ADD CONSTRAINT `tagged_in` FOREIGN KEY (`post_id`) REFERENCES `picture` (`id`);
 
 --
 -- Tablo kısıtlamaları `timeline`
 --
 ALTER TABLE `timeline`
-ADD CONSTRAINT `post_subject` FOREIGN KEY (`post_id`) REFERENCES `actors` (`actor_id`),
-ADD CONSTRAINT `timeline_tp` FOREIGN KEY (`actor_id`) REFERENCES `actors` (`actor_id`);
+  ADD CONSTRAINT `post_subject` FOREIGN KEY (`post_id`) REFERENCES `actors` (`actor_id`),
+  ADD CONSTRAINT `timeline_tp` FOREIGN KEY (`actor_id`) REFERENCES `actors` (`actor_id`);
 
 --
 -- Tablo kısıtlamaları `user_info`
 --
 ALTER TABLE `user_info`
-ADD CONSTRAINT `religion` FOREIGN KEY (`religion`) REFERENCES `page_generic` (`pagenumber`),
-ADD CONSTRAINT `user_actor` FOREIGN KEY (`user_id`) REFERENCES `actors` (`actor_id`) ON UPDATE CASCADE,
-ADD CONSTRAINT `user_address` FOREIGN KEY (`address`) REFERENCES `address` (`address_id`),
-ADD CONSTRAINT `user_email` FOREIGN KEY (`mail`) REFERENCES `emails` (`email_id`) ON UPDATE CASCADE,
-ADD CONSTRAINT `user_gender` FOREIGN KEY (`gender`) REFERENCES `gender` (`gender_id`) ON UPDATE CASCADE,
-ADD CONSTRAINT `user_lang` FOREIGN KEY (`lang`) REFERENCES `lang` (`id`),
-ADD CONSTRAINT `user_marital` FOREIGN KEY (`marital_status_code`) REFERENCES `marital_status` (`marital_status_id`) ON UPDATE CASCADE;
+  ADD CONSTRAINT `religion` FOREIGN KEY (`religion`) REFERENCES `page_generic` (`pagenumber`),
+  ADD CONSTRAINT `user_actor` FOREIGN KEY (`user_id`) REFERENCES `actors` (`actor_id`) ON UPDATE CASCADE,
+  ADD CONSTRAINT `user_address` FOREIGN KEY (`address`) REFERENCES `address` (`address_id`),
+  ADD CONSTRAINT `user_email` FOREIGN KEY (`mail`) REFERENCES `emails` (`email_id`) ON UPDATE CASCADE,
+  ADD CONSTRAINT `user_gender` FOREIGN KEY (`gender`) REFERENCES `gender` (`gender_id`) ON UPDATE CASCADE,
+  ADD CONSTRAINT `user_lang` FOREIGN KEY (`lang`) REFERENCES `lang` (`id`),
+  ADD CONSTRAINT `user_marital` FOREIGN KEY (`marital_status_code`) REFERENCES `marital_status` (`marital_status_id`) ON UPDATE CASCADE;
 
 --
 -- Tablo kısıtlamaları `volunteers`
 --
 ALTER TABLE `volunteers`
-ADD CONSTRAINT `volunteer_user` FOREIGN KEY (`volunteer`) REFERENCES `user_info` (`user_id`) ON DELETE CASCADE,
-ADD CONSTRAINT `voluntree_group` FOREIGN KEY (`voluntree`) REFERENCES `groups` (`group_id`) ON UPDATE CASCADE;
+  ADD CONSTRAINT `volunteer_user` FOREIGN KEY (`volunteer`) REFERENCES `user_info` (`user_id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `voluntree_group` FOREIGN KEY (`voluntree`) REFERENCES `groups` (`group_id`) ON UPDATE CASCADE;
 
 --
 -- Tablo kısıtlamaları `want_ad`
 --
 ALTER TABLE `want_ad`
-ADD CONSTRAINT `ad_goes_to` FOREIGN KEY (`employer_id`) REFERENCES `employer` (`employer_id`),
-ADD CONSTRAINT `ad_job_type` FOREIGN KEY (`job_type`) REFERENCES `job_type` (`job_type_page`),
-ADD CONSTRAINT `ad_responsibility_user` FOREIGN KEY (`ad_responsibility`) REFERENCES `user_info` (`user_id`);
+  ADD CONSTRAINT `ad_goes_to` FOREIGN KEY (`employer_id`) REFERENCES `employer` (`employer_id`),
+  ADD CONSTRAINT `ad_job_type` FOREIGN KEY (`job_type`) REFERENCES `job_type` (`job_type_page`),
+  ADD CONSTRAINT `ad_responsibility_user` FOREIGN KEY (`ad_responsibility`) REFERENCES `user_info` (`user_id`);
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
