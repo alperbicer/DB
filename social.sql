@@ -3,7 +3,7 @@
 -- http://www.phpmyadmin.net
 --
 -- Anamakine: localhost
--- Üretim Zamanı: 28 Ara 2014, 20:23:07
+-- Üretim Zamanı: 28 Ara 2014, 21:11:29
 -- Sunucu sürümü: 5.5.40-0ubuntu1
 -- PHP Sürümü: 5.5.12-2ubuntu5
 
@@ -19,7 +19,7 @@ SET time_zone = "+00:00";
 --
 -- Veritabanı: `social`
 --
-CREATE DATABASE IF NOT EXISTS `social` DEFAULT CHARACTER SET latin1 COLLATE latin1_swedish_ci;
+CREATE DATABASE IF NOT EXISTS `social` DEFAULT CHARACTER SET utf8 COLLATE utf8_turkish_ci;
 USE `social`;
 
 DELIMITER $$
@@ -187,11 +187,18 @@ INSERT INTO `city` (`id`, `city`) VALUES
 
 DROP TABLE IF EXISTS `comments`;
 CREATE TABLE IF NOT EXISTS `comments` (
-  `id` int(11) NOT NULL,
+`id` int(11) NOT NULL,
   `comment` varchar(250) COLLATE utf32_turkish_ci NOT NULL,
   `post_id` int(11) NOT NULL,
   `created_by` int(11) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf32 COLLATE=utf32_turkish_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf32 COLLATE=utf32_turkish_ci;
+
+--
+-- Tablo döküm verisi `comments`
+--
+
+INSERT INTO `comments` (`id`, `comment`, `post_id`, `created_by`) VALUES
+(1, 'Teşekkür ederim Erkin.', 1, 58);
 
 -- --------------------------------------------------------
 
@@ -1273,6 +1280,11 @@ ALTER TABLE `want_ad`
 ALTER TABLE `actors`
 MODIFY `actor_id` int(11) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=101;
 --
+-- Tablo için AUTO_INCREMENT değeri `comments`
+--
+ALTER TABLE `comments`
+MODIFY `id` int(11) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=2;
+--
 -- Tablo için AUTO_INCREMENT değeri `employer`
 --
 ALTER TABLE `employer`
@@ -1302,8 +1314,8 @@ ADD CONSTRAINT `blocker` FOREIGN KEY (`blocker`) REFERENCES `user_info` (`user_i
 -- Tablo kısıtlamaları `comments`
 --
 ALTER TABLE `comments`
-ADD CONSTRAINT `comment_activity` FOREIGN KEY (`id`) REFERENCES `actors` (`actor_id`),
-ADD CONSTRAINT `comment_refers_to` FOREIGN KEY (`post_id`) REFERENCES `post` (`post_id`);
+ADD CONSTRAINT `commented_by` FOREIGN KEY (`created_by`) REFERENCES `actors` (`actor_id`) ON UPDATE CASCADE,
+ADD CONSTRAINT `comment_refers_to` FOREIGN KEY (`post_id`) REFERENCES `post` (`post_id`) ON UPDATE CASCADE;
 
 --
 -- Tablo kısıtlamaları `curriculumvitae`
