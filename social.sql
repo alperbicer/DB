@@ -3,7 +3,7 @@
 -- http://www.phpmyadmin.net
 --
 -- Anamakine: localhost
--- Üretim Zamanı: 28 Ara 2014, 18:16:48
+-- Üretim Zamanı: 28 Ara 2014, 18:57:52
 -- Sunucu sürümü: 5.5.40-0ubuntu1
 -- PHP Sürümü: 5.5.12-2ubuntu5
 
@@ -895,7 +895,8 @@ INSERT INTO `user_info` (`user_id`, `date_joined`, `date_of_birth`, `givenname`,
 (0, '2014-12-31', '2014-12-30', 'A', 'B', 'C', 1, 5, 1, 1, NULL, 3, 1, 1),
 (1, '2004-05-02', '1984-05-11', 'Mark', NULL, 'Zuckerberg', 2, 1, 0, 0, 64, 0, 0, 0),
 (57, '2012-12-21', '1994-12-27', 'Erkin', 'Alp', 'Güney', 2, 0, 0, 1, NULL, 0, 1, 1),
-(63, '2012-12-21', '1991-08-25', 'Alper', NULL, 'Biçer', 2, 0, 0, 1, 59, 0, 2, 1);
+(63, '2012-12-21', '1991-08-25', 'Alper', NULL, 'Biçer', 2, 0, 0, 1, 59, 0, 2, 1),
+(99, '2014-12-28', '1998-01-01', 'Googlebot', NULL, NULL, 0, 0, 0, 1, NULL, 0, 0, 0);
 
 --
 -- Tetikleyiciler `user_info`
