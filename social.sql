@@ -17,9 +17,11 @@ SET time_zone = "+00:00";
 /*!40101 SET NAMES utf8 */;
 
 --
--- Veritabanı: `DB3`
+-- Veritabanı: `social`
 --
-
+drop database if exists social;
+create database social;
+use social;
 DELIMITER $$
 --
 -- İşlevler
