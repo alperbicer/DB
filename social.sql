@@ -3,7 +3,7 @@
 -- http://www.phpmyadmin.net
 --
 -- Anamakine: localhost
--- Üretim Zamanı: 28 Ara 2014, 18:57:52
+-- Üretim Zamanı: 28 Ara 2014, 19:35:11
 -- Sunucu sürümü: 5.5.40-0ubuntu1
 -- PHP Sürümü: 5.5.12-2ubuntu5
 
@@ -53,7 +53,7 @@ DROP TABLE IF EXISTS `actors`;
 CREATE TABLE IF NOT EXISTS `actors` (
 `actor_id` int(11) NOT NULL,
   `privacy_minus` int(11) DEFAULT NULL
-) ENGINE=InnoDB AUTO_INCREMENT=100 DEFAULT CHARSET=utf32 COLLATE=utf32_turkish_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=101 DEFAULT CHARSET=utf32 COLLATE=utf32_turkish_ci;
 
 --
 -- Tablo döküm verisi `actors`
@@ -71,7 +71,8 @@ INSERT INTO `actors` (`actor_id`, `privacy_minus`) VALUES
 (63, NULL),
 (64, NULL),
 (65, NULL),
-(99, NULL);
+(99, NULL),
+(100, NULL);
 
 -- --------------------------------------------------------
 
@@ -106,7 +107,9 @@ CREATE TABLE IF NOT EXISTS `address` (
 
 INSERT INTO `address` (`address_id`, `door`, `buildingname`, `street`, `avenue`, `boulevard`, `locality`, `neighbourhood`, `village`, `county`, `township`, `town`, `city`, `province`, `state`, `confederate`, `country`) VALUES
 (0, 174, 'Woodland Apartments', 'Edgewood Driveway', 'Newell Road', 'Woodland Avenue', 'Woodland ', 'Newell', NULL, NULL, 'Palo Alto', 7, 7, NULL, 8, NULL, 'USA'),
-(1, 17, NULL, '1909. Sokak', '1912. Sokak', 'Nursultan Nazarbayev Caddesi', NULL, 'Bayraklı Mahallesi', NULL, 'Smyrna', 'Bayraklı 3. Yerleşim Bölgesi', 2, 1, 1, 5, NULL, 'TUR');
+(1, 17, NULL, '1909. Sokak', '1912. Sokak', 'Nursultan Nazarbayev Caddesi', NULL, 'Bayraklı Mahallesi', NULL, 'Smyrna', 'Bayraklı 3. Yerleşim Bölgesi', 2, 1, 1, 5, NULL, 'TUR'),
+(2, 1600, 'Googleplex', 'Amphitheatre Parkway', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, 2, 7, 8, NULL, 'USA'),
+(3, 1, 'Microsoft Building', 'Microsoft Way', NULL, 'NE Bellevue Redmond Road', NULL, 'Redmond Industrial', NULL, NULL, NULL, 9, 9, NULL, 10, NULL, 'USA');
 
 -- --------------------------------------------------------
 
@@ -172,7 +175,9 @@ INSERT INTO `city` (`id`, `city`) VALUES
 (5, 'Ege Bölgesi'),
 (6, 'Marmara Bölgesi'),
 (7, 'Mountain View'),
-(8, 'California');
+(8, 'California'),
+(9, 'Redmond'),
+(10, 'Washington');
 
 -- --------------------------------------------------------
 
@@ -760,14 +765,16 @@ DROP TABLE IF EXISTS `post`;
 CREATE TABLE IF NOT EXISTS `post` (
 `post_id` int(11) NOT NULL,
   `actor_id` int(11) NOT NULL
-) ENGINE=InnoDB AUTO_INCREMENT=100 DEFAULT CHARSET=utf32 COLLATE=utf32_turkish_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=102 DEFAULT CHARSET=utf32 COLLATE=utf32_turkish_ci;
 
 --
 -- Tablo döküm verisi `post`
 --
 
 INSERT INTO `post` (`post_id`, `actor_id`) VALUES
-(1, 57);
+(1, 57),
+(100, 99),
+(101, 100);
 
 --
 -- Tetikleyiciler `post`
@@ -861,7 +868,9 @@ CREATE TABLE IF NOT EXISTS `timeline` (
 --
 
 INSERT INTO `timeline` (`actor_id`, `post_id`, `shown_at`) VALUES
-(57, 1, '2014-12-28');
+(57, 1, '2014-12-28'),
+(99, 100, '2014-12-28'),
+(100, 101, '2014-12-28');
 
 -- --------------------------------------------------------
 
@@ -896,7 +905,8 @@ INSERT INTO `user_info` (`user_id`, `date_joined`, `date_of_birth`, `givenname`,
 (1, '2004-05-02', '1984-05-11', 'Mark', NULL, 'Zuckerberg', 2, 1, 0, 0, 64, 0, 0, 0),
 (57, '2012-12-21', '1994-12-27', 'Erkin', 'Alp', 'Güney', 2, 0, 0, 1, NULL, 0, 1, 1),
 (63, '2012-12-21', '1991-08-25', 'Alper', NULL, 'Biçer', 2, 0, 0, 1, 59, 0, 2, 1),
-(99, '2014-12-28', '1998-01-01', 'Googlebot', NULL, NULL, 0, 0, 0, 1, NULL, 0, 0, 0);
+(99, '2014-12-28', '1998-01-01', 'Googlebot', NULL, NULL, 0, 0, 0, 2, NULL, 0, 0, 0),
+(100, '2014-12-28', '2012-12-21', 'Bingbot', NULL, NULL, 0, 0, 0, 3, NULL, 0, 0, 0);
 
 --
 -- Tetikleyiciler `user_info`
@@ -1255,7 +1265,7 @@ ALTER TABLE `want_ad`
 -- Tablo için AUTO_INCREMENT değeri `actors`
 --
 ALTER TABLE `actors`
-MODIFY `actor_id` int(11) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=100;
+MODIFY `actor_id` int(11) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=101;
 --
 -- Tablo için AUTO_INCREMENT değeri `employer`
 --
@@ -1270,7 +1280,7 @@ MODIFY `marital_status_id` smallint(6) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=10
 -- Tablo için AUTO_INCREMENT değeri `post`
 --
 ALTER TABLE `post`
-MODIFY `post_id` int(11) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=100;
+MODIFY `post_id` int(11) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=102;
 --
 -- Dökümü yapılmış tablolar için kısıtlamalar
 --
