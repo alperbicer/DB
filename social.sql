@@ -3,7 +3,7 @@
 -- http://www.phpmyadmin.net
 --
 -- Anamakine: localhost
--- Üretim Zamanı: 28 Ara 2014, 19:35:11
+-- Üretim Zamanı: 28 Ara 2014, 20:23:07
 -- Sunucu sürümü: 5.5.40-0ubuntu1
 -- PHP Sürümü: 5.5.12-2ubuntu5
 
@@ -329,7 +329,9 @@ CREATE TABLE IF NOT EXISTS `emails` (
 INSERT INTO `emails` (`email_id`, `email_textual`) VALUES
 (0, 'zuck@facebook.com'),
 (1, 'erkinalp9035@gmail.com'),
-(2, 'alperbicer@gmail.com');
+(2, 'alperbicer@gmail.com'),
+(3, 'page@google.com'),
+(4, 'bill@microsoft.com');
 
 -- --------------------------------------------------------
 
@@ -765,7 +767,7 @@ DROP TABLE IF EXISTS `post`;
 CREATE TABLE IF NOT EXISTS `post` (
 `post_id` int(11) NOT NULL,
   `actor_id` int(11) NOT NULL
-) ENGINE=InnoDB AUTO_INCREMENT=102 DEFAULT CHARSET=utf32 COLLATE=utf32_turkish_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=103 DEFAULT CHARSET=utf32 COLLATE=utf32_turkish_ci;
 
 --
 -- Tablo döküm verisi `post`
@@ -905,8 +907,8 @@ INSERT INTO `user_info` (`user_id`, `date_joined`, `date_of_birth`, `givenname`,
 (1, '2004-05-02', '1984-05-11', 'Mark', NULL, 'Zuckerberg', 2, 1, 0, 0, 64, 0, 0, 0),
 (57, '2012-12-21', '1994-12-27', 'Erkin', 'Alp', 'Güney', 2, 0, 0, 1, NULL, 0, 1, 1),
 (63, '2012-12-21', '1991-08-25', 'Alper', NULL, 'Biçer', 2, 0, 0, 1, 59, 0, 2, 1),
-(99, '2014-12-28', '1998-01-01', 'Googlebot', NULL, NULL, 0, 0, 0, 2, NULL, 0, 0, 0),
-(100, '2014-12-28', '2012-12-21', 'Bingbot', NULL, NULL, 0, 0, 0, 3, NULL, 0, 0, 0);
+(99, '2014-12-28', '1998-01-01', 'Googlebot', NULL, NULL, 0, 0, 0, 2, NULL, 0, 3, 0),
+(100, '2014-12-28', '2012-12-21', 'Bingbot', NULL, NULL, 0, 0, 0, 3, NULL, 0, 4, 0);
 
 --
 -- Tetikleyiciler `user_info`
@@ -920,7 +922,9 @@ CREATE TRIGGER `update_info` AFTER UPDATE ON `user_info`
 
    SELECT new.user_id INTO actor;
 
+   if (select actor_id from actors where actor=actor_id) is null then
    insert into post(actor_id) values (actor);
+   end if;
    
 END
 //
@@ -934,7 +938,9 @@ CREATE TRIGGER `user_create` BEFORE INSERT ON `user_info`
 
    SELECT new.user_id INTO actor;
 
-   insert into actors values (actor,null);
+    if (select actor_id from actors where actor=actor_id) is null then
+    insert into actors values (actor,null);
+    end if;
    
 END
 //
@@ -1280,7 +1286,7 @@ MODIFY `marital_status_id` smallint(6) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=10
 -- Tablo için AUTO_INCREMENT değeri `post`
 --
 ALTER TABLE `post`
-MODIFY `post_id` int(11) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=102;
+MODIFY `post_id` int(11) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=103;
 --
 -- Dökümü yapılmış tablolar için kısıtlamalar
 --
